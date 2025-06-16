@@ -1,0 +1,494 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".module.detail.UserInfoActivity"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="80dp">
+
+        <ImageButton
+            android:id="@+id/btn_back"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="10dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/back_icon" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="信息修改"
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="5dp"
+            android:textSize="18dp"
+            android:layout_marginBottom="3dp"
+            android:layout_toRightOf="@+id/btn_back"/>
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        
+        <androidx.cardview.widget.CardView
+            android:id="@+id/user_head_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="5dp"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <androidx.cardview.widget.CardView
+                            android:id="@+id/cardview"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            app:cardCornerRadius="45dp"
+                            app:cardElevation="10dp"
+                            android:layout_gravity="center"
+                            app:cardPreventCornerOverlap="true"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginLeft="20dp"
+                            android:layout_marginBottom="10dp">
+
+                            <ImageView
+                                android:id="@+id/user_head"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:src="@mipmap/user_head"
+                                android:scaleType="centerCrop"/>
+
+                        </androidx.cardview.widget.CardView>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="20dp"
+                                android:layout_marginTop="10dp"
+                                android:layout_marginRight="10dp"
+                                android:layout_marginBottom="5dp"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_centerInParent="true"
+                                    android:layout_centerVertical="true"
+                                    android:text="用户名："
+                                    android:textColor="@color/gray"
+                                    android:textSize="14dp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/user_name"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center"
+                                    android:layout_marginLeft="10dp"
+                                    android:text="Jessica"
+                                    android:textColor="@color/black"
+                                    android:textSize="14dp" />
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="20dp"
+                                android:layout_marginRight="10dp"
+                                android:layout_marginBottom="5dp"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_centerInParent="true"
+                                    android:layout_centerVertical="true"
+                                    android:text="性别："
+                                    android:textColor="@color/gray"
+                                    android:textSize="14dp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/user_sex"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center"
+                                    android:layout_marginLeft="10dp"
+                                    android:text="女"
+                                    android:textColor="@color/black"
+                                    android:textSize="14dp" />
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="20dp"
+                                android:layout_marginRight="10dp"
+                                android:layout_marginBottom="10dp"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_centerInParent="true"
+                                    android:layout_centerVertical="true"
+                                    android:text="出生年月："
+                                    android:textColor="@color/gray"
+                                    android:textSize="14dp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/user_bir"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center"
+                                    android:layout_marginLeft="10dp"
+                                    android:text="2000/8"
+                                    android:textColor="@color/black"
+                                    android:textSize="14dp" />
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <ImageButton
+                        android:id="@+id/back_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/big_go_icon"
+                        android:layout_centerVertical="true"
+                        android:layout_alignParentRight="true"
+                        android:background="@android:color/transparent"
+                        android:layout_marginRight="10dp"/>
+
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginBottom="10dp"
+                        android:layout_marginTop="10dp">
+
+                        <TextView
+                            android:id="@+id/test_7"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="所在省份："
+                            android:layout_centerVertical="true"
+                            android:textColor="@color/gray"
+                            android:textStyle="bold"
+                            android:textSize="14dp" />
+
+                        <Spinner
+                            android:id="@+id/edit_user_province"
+                            android:layout_width="match_parent"
+                            android:textSize="14dp"
+                            android:layout_height="wrap_content">
+                        </Spinner>
+
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginBottom="10dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="所选科目："
+                            android:layout_centerVertical="true"
+                            android:textColor="@color/gray"
+                            android:textStyle="bold"
+                            android:layout_centerInParent="true"
+                            android:textSize="14dp" />
+
+                        <TextView
+                            android:id="@+id/user_course"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="--/--/--"
+                            android:textSize="14dp"
+                            android:layout_gravity="center"
+                            android:textColor="@color/black"
+                            android:layout_marginLeft="10dp"/>
+
+                    </LinearLayout>
+
+                    <com.google.android.flexbox.FlexboxLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:layout_marginLeft="80dp"
+                        android:layout_marginBottom="10dp">
+
+                        <TextView
+                            android:id="@+id/btn_physics"
+                            style="@style/TagStyle"
+                            android:text="物理" />
+
+                        <TextView
+                            android:id="@+id/btn_history"
+                            style="@style/TagStyle"
+                            android:text="历史" />
+
+                    </com.google.android.flexbox.FlexboxLayout>
+
+                    <com.google.android.flexbox.FlexboxLayout
+                        android:id="@+id/flexbox"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:layout_marginLeft="80dp"
+                        android:layout_marginBottom="10dp">
+
+                        <TextView
+                            android:id="@+id/btn_politics"
+                            style="@style/TagStyle"
+                            android:text="政治" />
+
+                        <TextView
+                            android:id="@+id/btn_chemical"
+                            style="@style/TagStyle"
+                            android:text="化学" />
+
+                        <TextView
+                            android:id="@+id/btn_geography"
+                            style="@style/TagStyle"
+                            android:text="地理" />
+
+                        <TextView
+                            android:id="@+id/btn_biology"
+                            style="@style/TagStyle"
+                            android:text="生物" />
+
+                    </com.google.android.flexbox.FlexboxLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginBottom="10dp"
+                        android:layout_marginTop="10dp">
+
+                        <TextView
+                            android:id="@+id/test_8"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="考试年份："
+                            android:layout_centerVertical="true"
+                            android:textColor="@color/gray"
+                            android:textStyle="bold"
+                            android:textSize="14dp" />
+
+                        <Spinner
+                            android:id="@+id/user_year"
+                            android:layout_width="match_parent"
+                            android:textSize="14dp"
+                            android:layout_height="wrap_content">
+                        </Spinner>
+
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginBottom="10dp"
+                        android:layout_marginTop="10dp">
+
+                        <TextView
+                            android:id="@+id/test_5"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="倾向省份："
+                            android:layout_centerVertical="true"
+                            android:textColor="@color/gray"
+                            android:textStyle="bold"
+                            android:textSize="14dp" />
+
+                        <TextView
+                            android:id="@+id/user_like_province"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_toRightOf="@+id/test_5"
+                            android:text="----"
+                            android:textSize="14dp"
+                            android:layout_gravity="center"
+                            android:textColor="@color/black"
+                            android:layout_marginLeft="10dp"/>
+
+                        <ImageButton
+                            android:id="@+id/edit_user_like_province"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:background="@android:color/transparent"
+                            android:layout_marginRight="10dp"
+                            android:src="@drawable/edit_like" />
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginBottom="10dp">
+
+                        <TextView
+                            android:id="@+id/test_6"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="倾向专业："
+                            android:layout_centerVertical="true"
+                            android:textColor="@color/gray"
+                            android:textStyle="bold"
+                            android:textSize="14dp" />
+
+                        <TextView
+                            android:id="@+id/user_like_major"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_toRightOf="@+id/test_6"
+                            android:text="----"
+                            android:textSize="14dp"
+                            android:layout_gravity="center"
+                            android:textColor="@color/black"
+                            android:layout_marginLeft="10dp"/>
+
+                        <ImageButton
+                            android:id="@+id/edit_user_like_major"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:background="@android:color/transparent"
+                            android:layout_marginRight="10dp"
+                            android:src="@drawable/edit_like" />
+
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginBottom="10dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="兴趣爱好："
+                            android:layout_centerVertical="true"
+                            android:textColor="@color/gray"
+                            android:textStyle="bold"
+                            android:textSize="14dp" />
+
+                    </RelativeLayout>
+
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginBottom="10dp">
+
+                        <EditText
+                            android:id="@+id/user_like_info"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/edit_background"
+                            android:hint="输入您的兴趣爱好"
+                            android:textSize="14dp"
+                            android:padding="10dp"
+                            android:inputType="text"
+                            android:imeOptions="actionDone"
+                            android:lines="4"
+                            android:cursorVisible="true" />
+
+                    </RelativeLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+            
+        </androidx.cardview.widget.CardView>
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button_background"
+        android:layout_marginTop="10dp">
+
+        <TextView
+            android:id="@+id/edit_done"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="完成"
+            android:textStyle="bold"
+            android:textSize="16dp"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/button_background"
+            android:textColor="@color/white"
+            android:padding="6dp" />
+
+    </RelativeLayout>
+
+</LinearLayout>
