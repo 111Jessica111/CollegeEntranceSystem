@@ -9,12 +9,10 @@ import android.widget.ImageButton
 import android.widget.RelativeLayout
 import android.widget.Spinner
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import com.example.collegeentrancesystem.R
 import com.example.collegeentrancesystem.base.BaseActivity
 import com.example.collegeentrancesystem.constant.DataModule
-import com.example.collegeentrancesystem.constant.Network
 import com.example.collegeentrancesystem.constant.PageName
 import com.example.collegeentrancesystem.constant.Province
 import com.example.collegeentrancesystem.constant.Subject
@@ -23,13 +21,6 @@ import com.example.collegeentrancesystem.databinding.ActivityUserInfoBinding
 import com.google.android.flexbox.FlexboxLayout
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import okhttp3.MediaType
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody
-import org.json.JSONArray
-import org.json.JSONObject
 
 class UserInfoActivity : BaseActivity<ActivityUserInfoBinding>() {
 
@@ -66,7 +57,6 @@ class UserInfoActivity : BaseActivity<ActivityUserInfoBinding>() {
 
         findViewById<RelativeLayout>(R.id.edit_done).setOnClickListener {
             sendUserInfoToHome()
-            sendMessagetoPy()
             finish()
         }
     }
@@ -217,43 +207,5 @@ class UserInfoActivity : BaseActivity<ActivityUserInfoBinding>() {
                 //不做处理
             }
         }
-    }
-
-    private fun sendMessagetoPy() {
-        Thread{
-            try {
-                if (selectedSubjects.isEmpty()){
-                    runOnUiThread {
-                        Toast.makeText(this, "未输入考试科目", Toast.LENGTH_SHORT).show()
-                    }
-                    return@Thread
-                }
-
-                val selectedSubjectsJson = JSONArray(selectedSubjects.map { it.toString() })
-
-                val userInfoJson = JSONObject().apply {
-                    put("province", selectedProvince)
-                    put("year", selectedYear)
-                    put("subject", selectedSubjectsJson[0])
-                }.toString()
-
-                //创建HTTP
-                val client = OkHttpClient()
-                val mediaType = "application/json".toMediaType()
-                val request = Request.Builder()
-                    .url("${Network.IP}/api/difficulty_coefficient")
-                    .post(RequestBody.create(mediaType, userInfoJson))
-                    .build()
-                //执行
-                val response = client.newCall(request).execute()
-
-            }catch (e: Exception){
-                e.printStackTrace()
-                runOnUiThread {
-                    Toast.makeText(this, "网络连接失败，请检查网络设置", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }.start()
-        //连接后端
     }
 }

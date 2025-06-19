@@ -15,9 +15,17 @@ import android.widget.TextView
 import android.graphics.Color
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
+import android.widget.Toast
 import com.example.collegeentrancesystem.R
 import androidx.activity.result.contract.ActivityResultContracts
+import com.blankj.utilcode.util.ThreadUtils.runOnUiThread
+import com.example.collegeentrancesystem.constant.Network
 import com.example.collegeentrancesystem.module.detail.UserInfoActivity
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody
+import org.json.JSONObject
 import kotlin.jvm.java
 
 class HomeFragment : Fragment() {
@@ -29,6 +37,7 @@ class HomeFragment : Fragment() {
     private lateinit var userScore: TextView
     private lateinit var inputUserScore: EditText
     private lateinit var inputUserDiff: EditText
+    private lateinit var predictScore: TextView
 
     private val userInfoLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
@@ -60,6 +69,7 @@ class HomeFragment : Fragment() {
         userCourseChoose = view.findViewById(R.id.user_course_choose)
         userYear = view.findViewById(R.id.user_year)
         userScore = view.findViewById(R.id.user_score)
+        predictScore = view.findViewById(R.id.predict_score)
 
 
         btnEditInfo.setOnClickListener {
@@ -89,6 +99,7 @@ class HomeFragment : Fragment() {
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 userScore.text = inputUserScore.text.toString()
                 dialog.dismiss()
+                sendMessagetoPy()
                 // 分数输入完成后判断年份
                 if (userYear.text.toString() == "2023") {
                     InputDiff()
@@ -101,6 +112,7 @@ class HomeFragment : Fragment() {
     }
     //难度
     private fun InputDiff() {
+
         val dialog = Dialog(requireActivity())
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
@@ -120,6 +132,54 @@ class HomeFragment : Fragment() {
                 false //事件未处理
             }
         }
+    }
+
+    private fun sendMessagetoPy() {
+        //连接后端
+        Thread{
+            try {
+                if (userScore.text.toString() == "---"){
+                    runOnUiThread {
+                        Toast.makeText(requireActivity(), "未输入分数", Toast.LENGTH_SHORT).show()
+                    }
+                    return@Thread
+                }
+
+                val userInfoJson = JSONObject().apply {
+                    put("province", userProvince.text.toString())
+                    put("year", userYear.text.toString())
+                    put("subject", userCourseChoose.text.toString().first())
+                    put("inputScore", userScore.text.toString())
+                }.toString()
+
+                //创建HTTP
+                val client = OkHttpClient()
+                val mediaType = "application/json".toMediaType()
+                val request = Request.Builder()
+                    .url("${Network.IP}/api/difficulty_coefficient")
+                    .post(RequestBody.create(mediaType, userInfoJson))
+                    .build()
+                //执行
+                val response = client.newCall(request).execute()
+
+                val res = response.body?.string() ?: ""
+                val jsonObject = JSONObject(res)
+
+                if (userYear.text.toString() == "2023") {
+                    val rank_now = jsonObject.getString("predictRank")
+
+                }else{
+                    val rank_before = jsonObject.getString("searchRank")
+                    predictScore.text = rank_before.toString()
+                }
+
+            }catch (e: Exception){
+                e.printStackTrace()
+                runOnUiThread {
+                    Toast.makeText(requireActivity(), "网络连接失败，请检查网络设置", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }.start()
     }
 
 }
