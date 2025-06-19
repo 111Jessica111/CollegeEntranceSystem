@@ -1,7 +1,8 @@
 package com.example.collegeentrancesystem.module.home
 
-import android.app.ActionBar.LayoutParams
+import android.app.Activity
 import android.app.Dialog
+import android.content.Intent
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -14,11 +15,10 @@ import android.widget.TextView
 import android.graphics.Color
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
-import androidx.appcompat.app.ActionBar
 import com.example.collegeentrancesystem.R
-import com.example.collegeentrancesystem.base.BaseActivity
-import com.example.collegeentrancesystem.constant.PageName
-import com.example.collegeentrancesystem.navigation.Router.navigation
+import androidx.activity.result.contract.ActivityResultContracts
+import com.example.collegeentrancesystem.module.detail.UserInfoActivity
+import kotlin.jvm.java
 
 class HomeFragment : Fragment() {
 
@@ -27,7 +27,21 @@ class HomeFragment : Fragment() {
     private lateinit var userCourseChoose: TextView
     private lateinit var userYear: TextView
     private lateinit var userScore: TextView
-    private lateinit var inputUserScore: TextView
+    private lateinit var inputUserScore: EditText
+    private lateinit var inputUserDiff: EditText
+
+    private val userInfoLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val data = result.data
+            val province = data?.getStringExtra("province")
+            val year = data?.getStringExtra("year")
+            val subjects = data?.getStringArrayListExtra("subjects")
+
+            userProvince.text = province?.take(2) ?: ""
+            userYear.text = year
+            userCourseChoose.text = subjects?.joinToString("/") { it.take(1) } ?: ""
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,39 +61,65 @@ class HomeFragment : Fragment() {
         userYear = view.findViewById(R.id.user_year)
         userScore = view.findViewById(R.id.user_score)
 
-        btnEditInfo.setOnClickListener {
-            (requireActivity() as? BaseActivity<*>)?.let { activity ->
-                activity.navigation(PageName.USER_INFO){ intent ->
 
-                }
-            }
+        btnEditInfo.setOnClickListener {
+            val intent = Intent(requireContext(), UserInfoActivity::class.java)
+            userInfoLauncher.launch(intent)
         }
 
         view.findViewById<ImageButton>(R.id.btn_edit_score).setOnClickListener {
-            val dialog = Dialog(requireActivity())
-            dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-
-            dialog.setContentView(R.layout.input_score)
-            dialog.window?.setLayout(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-            dialog.show()
-
-            inputUserScore = dialog.findViewById(R.id.user_score)
-
-            //监听
-            inputUserScore.setOnEditorActionListener { _, actionId, _ ->
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    userScore.text = inputUserScore.text.toString()
-                    dialog.dismiss()
-                    true //表示事件已处理
-                } else {
-                    false //事件未处理
-                }
-            }
+            InputUserScore()
         }
-
         return view
     }
+    //分数
+    private fun InputUserScore() {
+        val dialog = Dialog(requireActivity())
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+        dialog.setContentView(R.layout.input_score)
+        dialog.window?.setLayout(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        dialog.show()
+
+        inputUserScore = dialog.findViewById(R.id.user_score)
+        inputUserScore.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                userScore.text = inputUserScore.text.toString()
+                dialog.dismiss()
+                // 分数输入完成后判断年份
+                if (userYear.text.toString() == "2023") {
+                    InputDiff()
+                }
+                true //表示事件已处理
+            } else {
+                false //事件未处理
+            }
+        }
+    }
+    //难度
+    private fun InputDiff() {
+        val dialog = Dialog(requireActivity())
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+        dialog.setContentView(R.layout.input_difficulty)
+        dialog.window?.setLayout(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        dialog.show()
+
+        inputUserDiff = dialog.findViewById(R.id.user_diff)
+        inputUserDiff.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                dialog.dismiss()
+                true //表示事件已处理
+            } else {
+                false //事件未处理
+            }
+        }
+    }
+
 }

@@ -7,9 +7,13 @@ import com.example.collegeentrancesystem.constant.PageName
 import com.example.collegeentrancesystem.module.detail.UserInfoActivity
 
 object Router {
-    fun BaseActivity<*>.navigation(pageName: PageName, intentAction:(Intent)->Unit){
-        return when(pageName){
-            PageName.MAIN ->{
+    fun BaseActivity<*>.navigation(
+        pageName: PageName,
+        requestCode: Int? = null, // 新增：可选 requestCode
+        intentAction: (Intent) -> Unit = {}
+    ) {
+        when (pageName) {
+            PageName.MAIN -> {
                 val intent = Intent(this, MainActivity::class.java)
                 intentAction(intent)
                 startActivity(intent)
@@ -17,7 +21,11 @@ object Router {
             PageName.USER_INFO -> {
                 val intent = Intent(this, UserInfoActivity::class.java)
                 intentAction(intent)
-                startActivity(intent)
+                if (requestCode != null) {
+                    startActivityForResult(intent, requestCode)
+                } else {
+                    startActivity(intent)
+                }
             }
         }
     }

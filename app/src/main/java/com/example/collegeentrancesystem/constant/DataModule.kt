@@ -45,3 +45,15 @@ class YearModule{
         }
     }
 }
+
+class RequestCode{
+    companion object {
+        val REQUEST_CODE = 1001
+    }
+}
+
+class Network{
+    companion object{
+        val IP = "http://10.13.7.249:5000"
+    }
+}

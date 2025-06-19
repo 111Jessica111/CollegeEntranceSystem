@@ -1,15 +1,20 @@
 package com.example.collegeentrancesystem.module.detail
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.widget.ArrayAdapter
 import android.widget.ImageButton
+import android.widget.RelativeLayout
 import android.widget.Spinner
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import com.example.collegeentrancesystem.R
 import com.example.collegeentrancesystem.base.BaseActivity
 import com.example.collegeentrancesystem.constant.DataModule
+import com.example.collegeentrancesystem.constant.Network
 import com.example.collegeentrancesystem.constant.PageName
 import com.example.collegeentrancesystem.constant.Province
 import com.example.collegeentrancesystem.constant.Subject
@@ -18,12 +23,23 @@ import com.example.collegeentrancesystem.databinding.ActivityUserInfoBinding
 import com.google.android.flexbox.FlexboxLayout
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody
+import org.json.JSONArray
+import org.json.JSONObject
 
 class UserInfoActivity : BaseActivity<ActivityUserInfoBinding>() {
 
     private lateinit var provinceSpinner: Spinner
     private lateinit var yearSpinner: Spinner
     private lateinit var flexBox: FlexboxLayout
+
+    private lateinit var selectedProvince: String
+    private lateinit var selectedYear: String
+    private lateinit var selectedSubjects: List<String>
 
     private var provinceList: List<Province> = emptyList()
     private val subjects = mutableListOf<Subject>()
@@ -47,12 +63,34 @@ class UserInfoActivity : BaseActivity<ActivityUserInfoBinding>() {
         findViewById<ImageButton>(R.id.btn_back).setOnClickListener {
             finish()
         }
+
+        findViewById<RelativeLayout>(R.id.edit_done).setOnClickListener {
+            sendUserInfoToHome()
+            sendMessagetoPy()
+            finish()
+        }
+    }
+
+    private fun sendUserInfoToHome() {
+        //获取输入信息
+        selectedProvince = provinceSpinner.selectedItem.toString()
+        selectedYear = yearSpinner.selectedItem.toString()
+        selectedSubjects = subjects.filter{it.isSelected}.map { it.name }
+
+        //传递
+        val returnIntent = Intent()
+        returnIntent.putExtra("province", selectedProvince)
+        returnIntent.putExtra("year", selectedYear)
+        returnIntent.putExtra("subjects", ArrayList(selectedSubjects))
+
+        //返回
+        setResult(Activity.RESULT_OK, returnIntent)
     }
 
     private fun loadYearData() {
         try {
-            // 获取年份列表并反转顺序（从旧到新）
-            yearsList = YearModule.getAllYears().reversed()
+            //获取年份列表
+            yearsList = YearModule.getAllYears()
 
             val yearsAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, yearsList)
             yearsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -175,10 +213,47 @@ class UserInfoActivity : BaseActivity<ActivityUserInfoBinding>() {
             override fun onItemSelected(parent: android.widget.AdapterView<*>?, view: android.view.View?, position: Int, id: Long) {
                 onItemSelected(parent, view, position, id)
             }
-
             override fun onNothingSelected(parent: android.widget.AdapterView<*>?) {
                 //不做处理
             }
         }
+    }
+
+    private fun sendMessagetoPy() {
+        Thread{
+            try {
+                if (selectedSubjects.isEmpty()){
+                    runOnUiThread {
+                        Toast.makeText(this, "未输入考试科目", Toast.LENGTH_SHORT).show()
+                    }
+                    return@Thread
+                }
+
+                val selectedSubjectsJson = JSONArray(selectedSubjects.map { it.toString() })
+
+                val userInfoJson = JSONObject().apply {
+                    put("province", selectedProvince)
+                    put("year", selectedYear)
+                    put("subject", selectedSubjectsJson[0])
+                }.toString()
+
+                //创建HTTP
+                val client = OkHttpClient()
+                val mediaType = "application/json".toMediaType()
+                val request = Request.Builder()
+                    .url("${Network.IP}/api/difficulty_coefficient")
+                    .post(RequestBody.create(mediaType, userInfoJson))
+                    .build()
+                //执行
+                val response = client.newCall(request).execute()
+
+            }catch (e: Exception){
+                e.printStackTrace()
+                runOnUiThread {
+                    Toast.makeText(this, "网络连接失败，请检查网络设置", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }.start()
+        //连接后端
     }
 }
