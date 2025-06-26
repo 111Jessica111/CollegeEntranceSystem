@@ -21,9 +21,9 @@ class ScoreFragmentViewModel: BaseViewModel() {
         try {
             //测试数据
             val scoreDatas = listOf(
-                Entry(xScore = 200, yPeople = 50),
+                Entry(xScore = 200, yPeople = 20),
                 Entry(xScore = 500, yPeople = 25),
-                Entry(xScore = 750, yPeople = 1)
+                Entry(xScore = 750, yPeople = 8)
             )
             
             //转换为MPAndroidChart需要的Entry格式
@@ -32,13 +32,13 @@ class ScoreFragmentViewModel: BaseViewModel() {
             }
             val scoreDataSet = LineDataSet(chartEntries, "分数段人数分布")
             //最简化的样式设置
-            scoreDataSet.color = R.color.blue
+            scoreDataSet.color = android.graphics.Color.parseColor("#FF5722") // 使用红色
             scoreDataSet.lineWidth = 2f
             scoreDataSet.setCircleColor(android.graphics.Color.RED)
             scoreDataSet.circleRadius = 4f
             scoreDataSet.setDrawValues(false) //关闭数值显示
             scoreDataSet.setDrawCircles(true) //显示数据点
-            scoreDataSet.setDrawCircleHole(true) //显示空心圆
+            scoreDataSet.setDrawCircleHole(false) //显示空心圆
             
             val lineData = LineData(scoreDataSet)
             

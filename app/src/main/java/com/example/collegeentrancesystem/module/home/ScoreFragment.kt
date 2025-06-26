@@ -96,14 +96,22 @@ class ScoreFragment : Fragment() {
                 }
             })
             
-            // 设置X轴 - 最小化配置
+            //设置X轴 - 最小化配置
             val xAxis = scoreChart.xAxis
             xAxis.position = XAxis.XAxisPosition.BOTTOM
+            xAxis.setDrawGridLines(false) //关闭X轴网格线
             
-            // 隐藏右侧Y轴
+            //设置Y轴
+            val leftAxis = scoreChart.axisLeft
+            leftAxis.setDrawGridLines(false) //关闭Y轴网格线
+            
+            //隐藏右侧Y轴
             scoreChart.axisRight.isEnabled = false
             
-            // 暂时关闭动画，避免计算问题
+            //关闭网格背景
+            scoreChart.setDrawGridBackground(false)
+            
+            //暂时关闭动画，避免计算问题
             scoreChart.animateX(1000)
             
         } catch (e: Exception) {

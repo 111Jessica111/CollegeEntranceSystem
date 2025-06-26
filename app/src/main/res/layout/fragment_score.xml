@@ -8,9 +8,90 @@
     android:background="@android:color/white"
     tools:context=".module.home.ScoreFragment">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Spinner
+            android:id="@+id/edit_user_province"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:textSize="14dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="25dp"
+            android:layout_height="wrap_content">
+        </Spinner>
+
+        <Spinner
+            android:id="@+id/edit_user_year"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_marginRight="25dp"
+            android:textSize="14dp"
+            android:layout_height="wrap_content">
+        </Spinner>
+
+        <Spinner
+            android:id="@+id/edit_user_subjrct"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_marginRight="15dp"
+            android:textSize="14dp"
+            android:layout_height="wrap_content">
+        </Spinner>
+
+    </LinearLayout>
+
     <com.github.mikephil.charting.charts.LineChart
         android:id="@+id/score_line"
         android:layout_width="match_parent"
+        android:layout_marginTop="10dp"
         android:layout_height="250dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="13dp"
+        android:text="一分一段表"
+        android:textStyle="bold"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="分数"
+            android:textColor="@color/gray"
+            android:textSize="12dp"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:textColor="@color/gray"
+            android:text="人数"
+            android:textSize="12dp"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:textColor="@color/gray"
+            android:text="排名"
+            android:textSize="12dp"/>
+
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_marginTop="5dp"
+        android:id="@+id/score_RecycleView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
 </LinearLayout>
