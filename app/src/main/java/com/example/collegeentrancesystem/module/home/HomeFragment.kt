@@ -18,15 +18,19 @@ import android.widget.EditText
 import android.widget.Toast
 import com.example.collegeentrancesystem.R
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.blankj.utilcode.util.ThreadUtils.runOnUiThread
+import com.example.collegeentrancesystem.base.list.BaseAdapter
+import com.example.collegeentrancesystem.bean.College
 import com.example.collegeentrancesystem.constant.Network
+import com.example.collegeentrancesystem.module.adapter.CollegeViewHolder
 import com.example.collegeentrancesystem.module.detail.UserInfoActivity
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
 import org.json.JSONObject
-import kotlin.jvm.java
 
 class HomeFragment : Fragment() {
 
@@ -38,6 +42,10 @@ class HomeFragment : Fragment() {
     private lateinit var inputUserScore: EditText
     private lateinit var inputUserDiff: EditText
     private lateinit var predictScore: TextView
+
+    private lateinit var collegeRecycleView: RecyclerView
+    private lateinit var viewModel: HomeFragmentViewModel
+    private lateinit var collegeAdapter: BaseAdapter
 
     private val userInfoLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
@@ -54,6 +62,7 @@ class HomeFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        viewModel = HomeFragmentViewModel()
     }
 
     override fun onCreateView(
@@ -71,6 +80,13 @@ class HomeFragment : Fragment() {
         userScore = view.findViewById(R.id.user_score)
         predictScore = view.findViewById(R.id.predict_score)
 
+        collegeRecycleView = view.findViewById(R.id.college_recycleView)
+        
+        // 设置RecyclerView
+        setupRecyclerView()
+        
+        // 加载大学数据
+        viewModel.loadCollegeData()
 
         btnEditInfo.setOnClickListener {
             val intent = Intent(requireContext(), UserInfoActivity::class.java)
@@ -82,6 +98,26 @@ class HomeFragment : Fragment() {
         }
         return view
     }
+    
+    private fun setupRecyclerView() {
+        collegeRecycleView.layoutManager = LinearLayoutManager(requireContext())
+        
+        collegeAdapter = BaseAdapter().build {
+            setItems<CollegeViewHolder, College>(
+                lifecycleOwner = viewLifecycleOwner,
+                layoutId = R.layout.college_show,
+                list = viewModel.collegeList
+            ) { holder, college ->
+                holder.bind(college)
+
+                holder.parent.setOnClickListener {
+                    //点击item时的监听
+                }
+            }
+        }
+        collegeRecycleView.adapter = collegeAdapter
+    }
+    
     //分数
     private fun InputUserScore() {
         val dialog = Dialog(requireActivity())
@@ -181,5 +217,4 @@ class HomeFragment : Fragment() {
             }
         }.start()
     }
-
 }

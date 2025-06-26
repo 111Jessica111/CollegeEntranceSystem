@@ -267,11 +267,15 @@
 
                         <TextView
                             android:id="@+id/btn_physics"
+                            android:layout_marginLeft="15dp"
+                            android:textSize="12dp"
                             style="@style/TagStyle"
                             android:text="物理" />
 
                         <TextView
                             android:id="@+id/btn_history"
+                            android:layout_marginLeft="15dp"
+                            android:textSize="12dp"
                             style="@style/TagStyle"
                             android:text="历史" />
 
@@ -287,21 +291,29 @@
 
                         <TextView
                             android:id="@+id/btn_politics"
+                            android:layout_marginLeft="15dp"
+                            android:textSize="12dp"
                             style="@style/TagStyle"
                             android:text="政治" />
 
                         <TextView
                             android:id="@+id/btn_chemical"
+                            android:layout_marginLeft="15dp"
+                            android:textSize="12dp"
                             style="@style/TagStyle"
                             android:text="化学" />
 
                         <TextView
                             android:id="@+id/btn_geography"
+                            android:layout_marginLeft="15dp"
+                            android:textSize="12dp"
                             style="@style/TagStyle"
                             android:text="地理" />
 
                         <TextView
                             android:id="@+id/btn_biology"
+                            android:layout_marginLeft="15dp"
+                            android:textSize="12dp"
                             style="@style/TagStyle"
                             android:text="生物" />
 

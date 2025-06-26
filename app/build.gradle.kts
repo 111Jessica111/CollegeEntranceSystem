@@ -49,6 +49,7 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.recyclerview)
+    implementation(libs.androidx.cardview)
 
     //retrofit
     implementation(libs.bundles.retrofit)
@@ -78,6 +79,9 @@ dependencies {
 
     // Flexbox布局库
     implementation(libs.flexbox)
+
+    // MPAndroidChart - 图表库
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
 
     /**其他工具**/
     //mmkv

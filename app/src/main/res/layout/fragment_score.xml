@@ -3,8 +3,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".module.home.ScoreFragment"
-    android:background="@color/green">
+    android:orientation="vertical"
+    android:padding="10dp"
+    android:background="@android:color/white"
+    tools:context=".module.home.ScoreFragment">
 
+    <com.github.mikephil.charting.charts.LineChart
+        android:id="@+id/score_line"
+        android:layout_width="match_parent"
+        android:layout_height="250dp" />
 
 </LinearLayout>
