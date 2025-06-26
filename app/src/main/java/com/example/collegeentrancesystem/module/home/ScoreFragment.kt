@@ -7,15 +7,34 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.Spinner
 import com.example.collegeentrancesystem.R
+import com.example.collegeentrancesystem.constant.Province
+import com.example.collegeentrancesystem.constant.SubjectModule
+import com.example.collegeentrancesystem.constant.YearModule
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import com.github.mikephil.charting.data.Entry as ChartEntry
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 
 class ScoreFragment : Fragment() {
     private lateinit var scoreChart: LineChart
     private lateinit var viewModel: ScoreFragmentViewModel
+
+    private lateinit var provinceSpinner: Spinner
+    private lateinit var yearSpinner: Spinner
+    private lateinit var subjectSpinner: Spinner
+
+    private lateinit var selectedProvince: String
+    private lateinit var selectedYear: String
+
+    private var provinceList: List<Province> = emptyList()
+    private var yearsList: List<String> = emptyList()
+    private var subjectList: List<String> = emptyList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,6 +52,9 @@ class ScoreFragment : Fragment() {
         try {
             // Inflate the layout for this fragment
             val view = inflater.inflate(R.layout.fragment_score, container, false)
+
+            initViews(view)
+
             scoreChart = view.findViewById(R.id.score_line)
             //初始化图表
             setupChart()
@@ -50,13 +72,123 @@ class ScoreFragment : Fragment() {
                     Log.e("ScoreFragment", "设置图表数据失败", e)
                 }
             }
+
+            loadProvinceData()
+            loadYearData()
+            loadSubjectData()
+            setupListeners()
+
             return view
         } catch (e: Exception) {
             Log.e("ScoreFragment", "创建视图失败", e)
             return null
         }
     }
-    
+
+    private fun loadProvinceData() {
+        try {
+            //获取 Fragment 的上下文
+            val context = context ?: return
+
+            //读取 json 文件
+            val inputStream = context.assets.open("province.json")
+            val jsonString = inputStream.bufferedReader().use { it.readText() }
+
+            //Gson 解析 json
+            val type = object : TypeToken<List<Province>>() {}.type
+            provinceList = Gson().fromJson(jsonString, type)
+
+            //设置省份数据
+            val provinceNames = provinceList.map { it.name }
+            val provinceAdapter = ArrayAdapter(
+                context,
+                android.R.layout.simple_spinner_item,
+                provinceNames
+            )
+            provinceAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            provinceSpinner.adapter = provinceAdapter
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun loadYearData() {
+        try {
+            //获取 Fragment 的上下文
+            val context = context ?: return
+
+            //获取年份列表
+            yearsList = YearModule.getAllYears()
+
+            val yearsAdapter = ArrayAdapter(context, android.R.layout.simple_spinner_item, yearsList)
+            yearsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            yearSpinner.adapter = yearsAdapter
+
+            //默认选择最新年份
+            val defaultYearIndex = yearsList.indexOfFirst { it == "2025" }
+            if (defaultYearIndex != -1) {
+                yearSpinner.setSelection(defaultYearIndex)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun loadSubjectData() {
+        try {
+            //获取 Fragment 的上下文
+            val context = context ?: return
+
+            //获取分类列表
+            subjectList = SubjectModule.getAllSubject()
+
+            val subjectAdapter = ArrayAdapter(context, android.R.layout.simple_spinner_item, subjectList)
+            subjectAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            subjectSpinner.adapter = subjectAdapter
+
+            //默认选择物理类
+            val defaultYearIndex = yearsList.indexOfFirst { it == "物理类" }
+            if (defaultYearIndex != -1) {
+                yearSpinner.setSelection(defaultYearIndex)
+            }
+        }catch (e: Exception){
+            e.printStackTrace()
+        }
+
+    }
+
+    private fun setupListeners() {
+        //设置省份选择监听
+        provinceSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                //省份选择监听事件
+                val selectedProvince = provinceList[position]
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+
+            }
+        }
+        // 设置年份选择监听
+        yearSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                //年份选择监听事件
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+
+            }
+        }
+    }
+
+    private fun initViews(view: View) {
+        provinceSpinner = view.findViewById(R.id.edit_user_province)
+        yearSpinner = view.findViewById(R.id.edit_user_year)
+        subjectSpinner = view.findViewById(R.id.edit_user_subjrct)
+    }
+
+
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
     }

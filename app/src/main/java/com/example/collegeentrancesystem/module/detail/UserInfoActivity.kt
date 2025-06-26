@@ -86,7 +86,7 @@ class UserInfoActivity : BaseActivity<ActivityUserInfoBinding>() {
             yearsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             yearSpinner.adapter = yearsAdapter
             
-            // 默认选择最新年份
+            //默认选择最新年份
             val defaultYearIndex = yearsList.indexOfFirst { it == "2025" }
             if (defaultYearIndex != -1) {
                 yearSpinner.setSelection(defaultYearIndex)

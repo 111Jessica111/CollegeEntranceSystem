@@ -46,6 +46,18 @@ class YearModule{
     }
 }
 
+class SubjectModule{
+    companion object{
+        //可选择类别
+        fun getAllSubject(): List<String>{
+            return listOf(
+                "物理类",
+                "历史类"
+            )
+        }
+    }
+}
+
 class RequestCode{
     companion object {
         val REQUEST_CODE = 1001
