@@ -272,8 +272,7 @@ class ScoreFragment : Fragment() {
             
             //关闭网格背景
             scoreChart.setDrawGridBackground(false)
-            
-            //暂时关闭动画，避免计算问题
+
             scoreChart.animateX(1000)
             
         } catch (e: Exception) {

@@ -27,7 +27,7 @@ class ScoreFragmentViewModel: BaseViewModel() {
     fun loadScoreChartData(context: Context){
         try {
             //限制数据点数量，避免内存溢出
-            val maxDataPoints = 100 // 最多显示100个数据点
+            val maxDataPoints = 100 //最多显示100个数据点
             
             //从score.json加载实际数据
             val inputStream = context.assets.open("score.json")
@@ -76,7 +76,7 @@ class ScoreFragmentViewModel: BaseViewModel() {
                         }
                     }
                     
-                    // 按分数排序并去重
+                    //按分数排序并去重
                     sampled.distinctBy { it.xScore }.sortedBy { it.xScore }
                 } else {
                     validData
@@ -94,13 +94,13 @@ class ScoreFragmentViewModel: BaseViewModel() {
             
             Log.d("ScoreFragmentViewModel", "原始数据点: ${validData.size}, 采样后数据点: ${sampledData.size}")
             
-            // 转换为MPAndroidChart需要的Entry格式
+            //转换为MPAndroidChart需要的Entry格式
             val chartEntries = sampledData.map { entry ->
                 ChartEntry(entry.xScore.toFloat(), entry.yPeople.toFloat())
             }
             
             if (chartEntries.isEmpty()) {
-                // 如果没有有效数据，使用测试数据
+                //如果没有有效数据，使用测试数据
                 val testData = listOf(
                     Entry(xScore = 200, yPeople = 20),
                     Entry(xScore = 500, yPeople = 25),
@@ -130,18 +130,18 @@ class ScoreFragmentViewModel: BaseViewModel() {
     private fun createLineDataSet(chartEntries: List<ChartEntry>, label: String) {
         val scoreDataSet = LineDataSet(chartEntries, label)
         
-        // 优化样式设置，减少内存使用
+        //优化样式设置，减少内存使用
         scoreDataSet.color = android.graphics.Color.parseColor("#FF5722")
         scoreDataSet.lineWidth = 2f
         scoreDataSet.setCircleColor(android.graphics.Color.RED)
-        scoreDataSet.circleRadius = 3f // 减小圆点半径
-        scoreDataSet.setDrawValues(false) // 关闭数值显示
-        scoreDataSet.setDrawCircles(true) // 显示数据点
-        scoreDataSet.setDrawCircleHole(false) // 显示空心圆
+        scoreDataSet.circleRadius = 2f //减小圆点半径
+        scoreDataSet.setDrawValues(false) //关闭数值显示
+        scoreDataSet.setDrawCircles(true) //显示数据点
+        scoreDataSet.setDrawCircleHole(false) //显示空心圆
         
-        // 优化性能设置
-        scoreDataSet.setDrawFilled(false) // 关闭填充
-        scoreDataSet.mode = LineDataSet.Mode.LINEAR // 使用线性模式
+        //优化性能设置
+        scoreDataSet.setDrawFilled(false) //关闭填充
+        scoreDataSet.mode = LineDataSet.Mode.LINEAR //使用线性模式
         
         val lineData = LineData(scoreDataSet)
         _scoreChartData.value = lineData
@@ -186,7 +186,7 @@ class ScoreFragmentViewModel: BaseViewModel() {
         
         val peaks = mutableListOf<Entry>()
         
-        // 寻找局部最大值
+        //寻找局部最大值
         for (i in 1 until data.size - 1) {
             if (data[i].yPeople > data[i-1].yPeople && data[i].yPeople > data[i+1].yPeople) {
                 peaks.add(data[i])
@@ -194,7 +194,7 @@ class ScoreFragmentViewModel: BaseViewModel() {
             }
         }
         
-        // 如果峰值不够，添加一些高值点
+        //如果峰值不够，添加一些高值点
         if (peaks.size < maxPeaks) {
             val sortedByValue = data.sortedByDescending { it.yPeople }
             for (entry in sortedByValue) {

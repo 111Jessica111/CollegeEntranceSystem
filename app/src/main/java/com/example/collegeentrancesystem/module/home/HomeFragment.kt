@@ -23,6 +23,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.blankj.utilcode.util.ThreadUtils.runOnUiThread
 import com.example.collegeentrancesystem.base.list.BaseAdapter
 import com.example.collegeentrancesystem.bean.College
+import com.example.collegeentrancesystem.bean.DifficultyCoefficient
+import com.example.collegeentrancesystem.bean.DifficultyCoefficientSet
 import com.example.collegeentrancesystem.constant.Network
 import com.example.collegeentrancesystem.module.adapter.CollegeViewHolder
 import com.example.collegeentrancesystem.module.detail.UserInfoActivity
@@ -31,6 +33,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
 import org.json.JSONObject
+import android.util.Log
 
 class HomeFragment : Fragment() {
 
@@ -111,6 +114,7 @@ class HomeFragment : Fragment() {
         view.findViewById<ImageButton>(R.id.btn_edit_score).setOnClickListener {
             InputUserScore()
         }
+        
         return view
     }
     
@@ -151,7 +155,7 @@ class HomeFragment : Fragment() {
                 userScore.text = inputUserScore.text.toString()
                 dialog.dismiss()
                 
-                // 更新test4文本
+                //更新test4文本
                 updateTest4Text()
                 
                 sendMessagetoPy()
@@ -179,13 +183,241 @@ class HomeFragment : Fragment() {
         )
         dialog.show()
 
+        send2023MessageToPy(dialog)
+
         inputUserDiff = dialog.findViewById(R.id.user_diff)
         inputUserDiff.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
+                Thread{
+                    try {
+                        val userDiffJson = JSONObject().apply {
+                            put("diff", inputUserDiff.text.toString())
+                        }.toString()
+                        //创建HTTP
+                        val client = OkHttpClient()
+                        val mediaType = "application/json".toMediaType()
+                        val request = Request.Builder()
+                            .url("${Network.IP}/api/user_difficulty")
+                            .post(RequestBody.create(mediaType, userDiffJson))
+                            .build()
+                        //执行
+                        val response = client.newCall(request).execute()
+
+                        val res = response.body?.string() ?: ""
+                        Log.d("HomeFragment", "服务器响应: $res")
+
+                        if (res.isEmpty()) {
+                            throw Exception("服务器返回空响应")
+                        }
+
+                        val jsonObject = JSONObject(res)
+
+                        val rank_before = jsonObject.getString("searchRank")
+                        predictScore.text = rank_before.toString()
+
+                    }catch (e: Exception){
+                        e.printStackTrace()
+                    }
+                }
                 dialog.dismiss()
                 true //表示事件已处理
             } else {
                 false //事件未处理
+            }
+        }
+    }
+
+    private fun send2023MessageToPy(dialog: Dialog) {
+
+        val diff_2022 = dialog.findViewById<TextView>(R.id.diff_2022)
+        val diff_2021 = dialog.findViewById<TextView>(R.id.diff_2021)
+        val diff_2020 = dialog.findViewById<TextView>(R.id.diff_2020)
+        val diff_2019 = dialog.findViewById<TextView>(R.id.diff_2019)
+        val diff_2018 = dialog.findViewById<TextView>(R.id.diff_2018)
+        val diff_2017 = dialog.findViewById<TextView>(R.id.diff_2017)
+
+        // 显示加载状态
+        runOnUiThread {
+            diff_2022.text = "加载中..."
+            diff_2021.text = "加载中..."
+            diff_2020.text = "加载中..."
+            diff_2019.text = "加载中..."
+            diff_2018.text = "加载中..."
+            diff_2017.text = "加载中..."
+        }
+        //连接后端
+        Thread{
+            try {
+                if (userScore.text.toString() == "---"){
+                    runOnUiThread {
+                        Toast.makeText(requireActivity(), "未输入分数", Toast.LENGTH_SHORT).show()
+                        // 重置为默认状态
+                        resetDifficultyDisplay(dialog)
+                    }
+                    return@Thread
+                }
+
+                val userInfoJson = JSONObject().apply {
+                    put("province", userProvince.text.toString())
+                    put("year", userYear.text.toString())
+                    put("subject", userCourseChoose.text.toString().first())
+                    put("inputScore", userScore.text.toString())
+                }.toString()
+
+                //创建HTTP
+                val client = OkHttpClient()
+                val mediaType = "application/json".toMediaType()
+                val request = Request.Builder()
+                    .url("${Network.IP}/api/difficulty_coefficient")
+                    .post(RequestBody.create(mediaType, userInfoJson))
+                    .build()
+                //执行
+                val response = client.newCall(request).execute()
+
+                val res = response.body?.string() ?: ""
+                Log.d("HomeFragment", "服务器响应: $res")
+                
+                if (res.isEmpty()) {
+                    throw Exception("服务器返回空响应")
+                }
+
+                val jsonObject = JSONObject(res)
+
+                //检查响应状态
+                if (jsonObject.has("status") && jsonObject.getString("status") != "success") {
+                    val errorMsg = jsonObject.optString("message", "未知错误")
+                    throw Exception("服务器错误: $errorMsg")
+                }
+
+                val diff_before = jsonObject.getString("result_data")
+                
+                //解析难度系数数据
+                parseAndDisplayDifficultyCoefficients(diff_before, dialog)
+
+                val rank_before = jsonObject.getString("searchRank")
+                predictScore.text = rank_before.toString()
+
+                //更新test4文本
+                runOnUiThread {
+                    updateTest4Text()
+                }
+
+            }catch (e: Exception){
+                Log.e("HomeFragment", "获取难度系数失败", e)
+                runOnUiThread {
+                    Toast.makeText(requireActivity(), "获取难度系数失败: ${e.message}", Toast.LENGTH_SHORT).show()
+                    // 重置为默认状态
+                    resetDifficultyDisplay(dialog)
+                }
+            }
+        }.start()
+    }
+    
+    /**
+     * 重置难度系数显示为默认状态
+     */
+    private fun resetDifficultyDisplay(dialog: Dialog) {
+        val diff_2022 = dialog.findViewById<TextView>(R.id.diff_2022)
+        val diff_2021 = dialog.findViewById<TextView>(R.id.diff_2021)
+        val diff_2020 = dialog.findViewById<TextView>(R.id.diff_2020)
+        val diff_2019 = dialog.findViewById<TextView>(R.id.diff_2019)
+        val diff_2018 = dialog.findViewById<TextView>(R.id.diff_2018)
+        val diff_2017 = dialog.findViewById<TextView>(R.id.diff_2017)
+        
+        diff_2022.text = "---"
+        diff_2021.text = "---"
+        diff_2020.text = "---"
+        diff_2019.text = "---"
+        diff_2018.text = "---"
+        diff_2017.text = "---"
+    }
+    
+    /**
+     * 解析并显示难度系数数据
+     * 数据格式: [{2017: 0.3735}, {2018: 0.3259}, {2019: 0.3353}, {2020: 0.3029}, {2021: 0.3438}, {2022: 0.3502}]
+     */
+    private fun parseAndDisplayDifficultyCoefficients(diffData: String, dialog: Dialog) {
+        try {
+            val difficultySet = parseDifficultyData(diffData)
+            updateDifficultyUI(difficultySet, dialog)
+        } catch (e: Exception) {
+            runOnUiThread {
+                Toast.makeText(requireActivity(), "解析难度系数数据失败: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+    
+    /**
+     * 解析难度系数数据为DifficultyCoefficientSet对象
+     */
+    private fun parseDifficultyData(diffData: String): DifficultyCoefficientSet {
+        val coefficients = mutableListOf<DifficultyCoefficient>()
+        
+        //用JSON解析
+        try {
+            val jsonArray = org.json.JSONArray(diffData)
+            
+            for (i in 0 until jsonArray.length()) {
+                val jsonObject = jsonArray.getJSONObject(i)
+                val keys = jsonObject.keys()
+                while (keys.hasNext()) {
+                    val year = keys.next()
+                    val coefficient = jsonObject.getDouble(year)
+                    coefficients.add(DifficultyCoefficient(year, coefficient))
+                }
+            }
+            
+            return DifficultyCoefficientSet(coefficients)
+            
+        } catch (e: Exception) {
+            Log.d("HomeFragment", "JSON解析失败，尝试字符串解析: ${e.message}")
+        }
+        
+        //字符串解析
+        val cleanData = diffData.trim().removeSurrounding("[", "]")
+        val items = cleanData.split("}, {")
+        
+        for (item in items) {
+            try {
+                val cleanItem = item.trim().removeSurrounding("{", "}")
+                val parts = cleanItem.split(": ")
+                if (parts.size == 2) {
+                    val year = parts[0].trim()
+                    val coefficient = parts[1].trim().toDouble()
+                    coefficients.add(DifficultyCoefficient(year, coefficient))
+                }
+            } catch (e: Exception) {
+                Log.e("HomeFragment", "解析单个项目失败: $item", e)
+            }
+        }
+        
+        return DifficultyCoefficientSet(coefficients)
+    }
+    
+    /**
+     * 更新难度系数UI显示
+     */
+    private fun updateDifficultyUI(difficultySet: DifficultyCoefficientSet, dialog: Dialog) {
+        runOnUiThread {
+            try {
+                val diff_2022 = dialog.findViewById<TextView>(R.id.diff_2022)
+                val diff_2021 = dialog.findViewById<TextView>(R.id.diff_2021)
+                val diff_2020 = dialog.findViewById<TextView>(R.id.diff_2020)
+                val diff_2019 = dialog.findViewById<TextView>(R.id.diff_2019)
+                val diff_2018 = dialog.findViewById<TextView>(R.id.diff_2018)
+                val diff_2017 = dialog.findViewById<TextView>(R.id.diff_2017)
+                
+                //设置各年份的难度系数
+                diff_2022.text = difficultySet.getCoefficientByYear("2022")?.getFormattedCoefficient() ?: "---"
+                diff_2021.text = difficultySet.getCoefficientByYear("2021")?.getFormattedCoefficient() ?: "---"
+                diff_2020.text = difficultySet.getCoefficientByYear("2020")?.getFormattedCoefficient() ?: "---"
+                diff_2019.text = difficultySet.getCoefficientByYear("2019")?.getFormattedCoefficient() ?: "---"
+                diff_2018.text = difficultySet.getCoefficientByYear("2018")?.getFormattedCoefficient() ?: "---"
+                diff_2017.text = difficultySet.getCoefficientByYear("2017")?.getFormattedCoefficient() ?: "---"
+                
+            } catch (e: Exception) {
+                Log.e("HomeFragment", "更新UI失败", e)
+                Toast.makeText(requireActivity(), "更新界面失败", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -221,14 +453,8 @@ class HomeFragment : Fragment() {
                 val res = response.body?.string() ?: ""
                 val jsonObject = JSONObject(res)
 
-                if (userYear.text.toString() == "2023") {
-                    val diff_now = jsonObject.getString("result_data")
-                    val rank_now = jsonObject.getString("predictRank")
-                    predictScore.text = rank_now.toString()
-                }else{
-                    val rank_before = jsonObject.getString("searchRank")
-                    predictScore.text = rank_before.toString()
-                }
+                val rank_before = jsonObject.getString("searchRank")
+                predictScore.text = rank_before.toString()
                 
                 //更新test4文本
                 runOnUiThread {
