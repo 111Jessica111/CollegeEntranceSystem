@@ -226,13 +226,13 @@ class ScoreFragment : Fragment() {
             scoreChart.description.isEnabled = false
             scoreChart.legend.isEnabled = true
             scoreChart.setTouchEnabled(true)
-            scoreChart.setScaleEnabled(false) // 暂时关闭缩放
-            scoreChart.setPinchZoom(false) // 暂时关闭双指缩放
+            scoreChart.setScaleEnabled(false) //暂时关闭缩放
+            scoreChart.setPinchZoom(false) //暂时关闭双指缩放
             
             // 性能优化设置
-            scoreChart.setMaxVisibleValueCount(50) // 限制可见数据点数量
-            scoreChart.setVisibleXRangeMaximum(50f) // 限制X轴可见范围
-            scoreChart.setAutoScaleMinMaxEnabled(true) // 自动缩放
+            scoreChart.setMaxVisibleValueCount(50) //限制可见数据点数量
+            scoreChart.setVisibleXRangeMaximum(50f) //限制X轴可见范围
+            scoreChart.setAutoScaleMinMaxEnabled(true) //自动缩放
             
             //设置选择监听器
             scoreChart.setOnChartValueSelectedListener(object : OnChartValueSelectedListener {

@@ -197,7 +197,7 @@
                         android:id="@+id/adventure_sum"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="14"
+                        android:text="--"
                         android:textSize="28dp"
                         android:textStyle="bold"
                         android:textColor="@color/red_1"/>
@@ -272,7 +272,7 @@
                         android:id="@+id/safe_sum"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="36"
+                        android:text="--"
                         android:textSize="28dp"
                         android:textStyle="bold"
                         android:textColor="@color/blue"/>
@@ -345,7 +345,7 @@
                         android:id="@+id/guarantee_sum"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="42"
+                        android:text="--"
                         android:textSize="28dp"
                         android:textStyle="bold"
                         android:textColor="@color/green_1"/>

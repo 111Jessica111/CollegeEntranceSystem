@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.collegeentrancesystem.R
 import com.example.collegeentrancesystem.bean.College
 import com.example.collegeentrancesystem.bean.ScoreData
+import com.example.collegeentrancesystem.bean.University
 import com.example.collegeentrancesystem.utils.ImageUtils
 import com.example.collegeentrancesystem.utils.SimpleViewTarget
 import com.google.android.flexbox.FlexboxLayout
@@ -73,5 +74,26 @@ class ScoreViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         scoreText.text = scoreData.score
         peopleText.text = scoreData.people
         rankText.text = scoreData.rank
+    }
+}
+
+class SchoolViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    
+    private val schoolImage: ImageView = itemView.findViewById(R.id.school_image)
+    private val schoolName: TextView = itemView.findViewById(R.id.school_name)
+    private val schoolHighlight: TextView = itemView.findViewById(R.id.school_highlight)
+    private val schoolLocation: TextView = itemView.findViewById(R.id.school_location)
+    private val schoolLevel: TextView = itemView.findViewById(R.id.school_level)
+    private val schoolNature: TextView = itemView.findViewById(R.id.school_nature)
+
+    fun bind(university: University) {
+        schoolName.text = university.name
+        schoolHighlight.text = university.charact
+        schoolLocation.text = university.city
+        schoolLevel.text = university.levels
+        schoolNature.text = university.department
+
+        //使用ImageUtils加载网络图片
+        ImageUtils.loadImage(itemView.context, university.icon, schoolImage, R.drawable.placeholder)
     }
 }

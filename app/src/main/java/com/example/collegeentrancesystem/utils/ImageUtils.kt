@@ -13,6 +13,18 @@ import com.example.collegeentrancesystem.R
 
 object ImageUtils {
     fun loadImage(
+        context: android.content.Context,
+        url: String,
+        imageView: ImageView,
+        @DrawableRes placeholderResId: Int = R.drawable.placeholder
+    ) {
+        Glide.with(context)
+            .load(url)
+            .placeholder(placeholderResId)
+            .into(imageView)
+    }
+
+    fun loadImage(
         imageView: ImageView, url: String,
         target: Target<Drawable>, listener: RequestListener<Drawable>? = null,
     ) {
