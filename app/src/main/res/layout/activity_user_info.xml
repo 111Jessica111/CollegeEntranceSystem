@@ -94,7 +94,7 @@
                                 android:layout_marginLeft="20dp"
                                 android:layout_marginTop="10dp"
                                 android:layout_marginRight="10dp"
-                                android:layout_marginBottom="5dp"
+                                android:layout_marginBottom="20dp"
                                 android:orientation="horizontal">
 
                                 <TextView
@@ -124,7 +124,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginLeft="20dp"
                                 android:layout_marginRight="10dp"
-                                android:layout_marginBottom="5dp"
+                                android:layout_marginBottom="20dp"
                                 android:orientation="horizontal">
 
                                 <TextView
@@ -206,7 +206,7 @@
                         android:layout_marginLeft="20dp"
                         android:layout_marginRight="10dp"
                         android:layout_marginBottom="10dp"
-                        android:layout_marginTop="10dp">
+                        android:layout_marginTop="20dp">
 
                         <TextView
                             android:id="@+id/test_7"
@@ -233,6 +233,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="20dp"
                         android:layout_marginRight="10dp"
+                        android:layout_marginTop="10dp"
                         android:layout_marginBottom="10dp"
                         android:orientation="horizontal">
 
@@ -261,9 +262,9 @@
                     <com.google.android.flexbox.FlexboxLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="3dp"
+                        android:layout_marginTop="10dp"
                         android:layout_marginLeft="80dp"
-                        android:layout_marginBottom="10dp">
+                        android:layout_marginBottom="20dp">
 
                         <TextView
                             android:id="@+id/btn_physics"
@@ -287,7 +288,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="3dp"
                         android:layout_marginLeft="80dp"
-                        android:layout_marginBottom="10dp">
+                        android:layout_marginBottom="20dp">
 
                         <TextView
                             android:id="@+id/btn_politics"
@@ -359,8 +360,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="20dp"
                         android:layout_marginRight="10dp"
-                        android:layout_marginBottom="10dp"
-                        android:layout_marginTop="10dp">
+                        android:layout_marginBottom="20dp"
+                        android:layout_marginTop="20dp">
 
                         <TextView
                             android:id="@+id/test_5"
@@ -398,7 +399,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="20dp"
                         android:layout_marginRight="10dp"
-                        android:layout_marginBottom="10dp">
+                        android:layout_marginBottom="20dp">
 
                         <TextView
                             android:id="@+id/test_6"
@@ -437,7 +438,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="20dp"
                         android:layout_marginRight="10dp"
-                        android:layout_marginBottom="10dp">
+                        android:layout_marginBottom="20dp">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -499,7 +500,7 @@
             android:layout_centerHorizontal="true"
             android:background="@drawable/button_background"
             android:textColor="@color/white"
-            android:padding="6dp" />
+            android:padding="10dp" />
 
     </RelativeLayout>
 

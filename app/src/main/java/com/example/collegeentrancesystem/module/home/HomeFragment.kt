@@ -188,38 +188,62 @@ class HomeFragment : Fragment() {
         inputUserDiff = dialog.findViewById(R.id.user_diff)
         inputUserDiff.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                Thread{
+                val userInput = inputUserDiff.text.toString()
+
+                Thread {
                     try {
                         val userDiffJson = JSONObject().apply {
-                            put("diff", inputUserDiff.text.toString())
+                            put("diff", userInput)
                         }.toString()
+                        
                         //创建HTTP
-                        val client = OkHttpClient()
+                        val client = OkHttpClient.Builder()
+                            .connectTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+                            .readTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+                            .writeTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+                            .build()
                         val mediaType = "application/json".toMediaType()
                         val request = Request.Builder()
                             .url("${Network.IP}/api/user_difficulty")
                             .post(RequestBody.create(mediaType, userDiffJson))
+                            .addHeader("Content-Type", "application/json")
                             .build()
+
                         //执行
                         val response = client.newCall(request).execute()
 
                         val res = response.body?.string() ?: ""
-                        Log.d("HomeFragment", "服务器响应: $res")
 
                         if (res.isEmpty()) {
                             throw Exception("服务器返回空响应")
                         }
 
                         val jsonObject = JSONObject(res)
+                        
+                        //检查响应状态
+                        if (jsonObject.has("status") && jsonObject.getString("status") != "success") {
+                            val errorMsg = jsonObject.optString("message", "未知错误")
+                            throw Exception("服务器错误: $errorMsg")
+                        }
 
                         val rank_before = jsonObject.getString("searchRank")
-                        predictScore.text = rank_before.toString()
+                        
+                        //在主线程更新UI
+                        runOnUiThread {
+                            predictScore.text = rank_before.toString()
+                            Toast.makeText(requireActivity(), "难度系数发送成功", Toast.LENGTH_SHORT).show()
+                            dialog.dismiss()
+                        }
 
-                    }catch (e: Exception){
-                        e.printStackTrace()
+                    } catch (e: Exception) {
+                        Log.e("HomeFragment", "发送难度系数失败", e)
+                        runOnUiThread {
+                            Toast.makeText(requireActivity(), "发送失败: ${e.message}", Toast.LENGTH_SHORT).show()
+                            dialog.dismiss()
+                        }
                     }
-                }
-                dialog.dismiss()
+                }.start()
+                
                 true //表示事件已处理
             } else {
                 false //事件未处理
@@ -265,7 +289,11 @@ class HomeFragment : Fragment() {
                 }.toString()
 
                 //创建HTTP
-                val client = OkHttpClient()
+                val client = OkHttpClient.Builder()
+                    .connectTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+                    .readTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+                    .writeTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+                    .build()
                 val mediaType = "application/json".toMediaType()
                 val request = Request.Builder()
                     .url("${Network.IP}/api/difficulty_coefficient")
@@ -441,7 +469,11 @@ class HomeFragment : Fragment() {
                 }.toString()
 
                 //创建HTTP
-                val client = OkHttpClient()
+                val client = OkHttpClient.Builder()
+                    .connectTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+                    .readTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+                    .writeTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+                    .build()
                 val mediaType = "application/json".toMediaType()
                 val request = Request.Builder()
                     .url("${Network.IP}/api/difficulty_coefficient")
@@ -477,5 +509,48 @@ class HomeFragment : Fragment() {
         } else {
             test4.text = "实际排名："
         }
+    }
+    
+    /**
+     * 测试网络连接（仅用于调试）
+     */
+    private fun testNetworkConnection() {
+        Thread {
+            try {
+                Log.d("HomeFragment", "开始测试网络连接...")
+                Log.d("HomeFragment", "服务器地址: ${Network.IP}")
+                
+                val client = OkHttpClient.Builder()
+                    .connectTimeout(10, java.util.concurrent.TimeUnit.SECONDS)
+                    .readTimeout(10, java.util.concurrent.TimeUnit.SECONDS)
+                    .build()
+                
+                val request = Request.Builder()
+                    .url("${Network.IP}/api/test")
+                    .get()
+                    .build()
+                
+                val response = client.newCall(request).execute()
+                Log.d("HomeFragment", "网络测试响应码: ${response.code}")
+                
+                if (response.isSuccessful) {
+                    Log.d("HomeFragment", "网络连接正常")
+                    runOnUiThread {
+                        Toast.makeText(requireActivity(), "网络连接正常", Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                    Log.e("HomeFragment", "网络连接失败: ${response.code}")
+                    runOnUiThread {
+                        Toast.makeText(requireActivity(), "网络连接失败: ${response.code}", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                
+            } catch (e: Exception) {
+                Log.e("HomeFragment", "网络测试异常", e)
+                runOnUiThread {
+                    Toast.makeText(requireActivity(), "网络测试失败: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }.start()
     }
 }
