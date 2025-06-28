@@ -15,28 +15,28 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:textSize="12dp"/>
+            android:textSize="14dp"/>
 
         <TextView
             android:id="@+id/num"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:textSize="12dp"/>
+            android:textSize="14dp"/>
 
         <TextView
             android:id="@+id/rank"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:textSize="12dp"/>
+            android:textSize="14dp"/>
 
     </LinearLayout>
 
     <TextView
-        android:layout_marginTop="2dp"
         android:layout_width="match_parent"
         android:layout_height="2dp"
-        android:background="@drawable/line_3"/>
+        android:background="@drawable/line_3"
+        android:layout_marginBottom="5dp"/>
 
 </LinearLayout>

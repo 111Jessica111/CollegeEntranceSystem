@@ -222,8 +222,9 @@ class HomeFragment : Fragment() {
                 val jsonObject = JSONObject(res)
 
                 if (userYear.text.toString() == "2023") {
+                    val diff_now = jsonObject.getString("result_data")
                     val rank_now = jsonObject.getString("predictRank")
-
+                    predictScore.text = rank_now.toString()
                 }else{
                     val rank_before = jsonObject.getString("searchRank")
                     predictScore.text = rank_before.toString()

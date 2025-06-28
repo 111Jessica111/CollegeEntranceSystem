@@ -65,8 +65,10 @@ class ScoreFragment : Fragment() {
             setupChart()
             //设置RecyclerView
             setupRecyclerView()
+            //测试数据加载
+            viewModel.testDataLoading(requireContext())
             //加载数据
-            viewModel.loadScoreChartData()
+            viewModel.loadScoreChartData(requireContext())
             viewModel.loadScoreData(requireContext())
             
             //观察数据变化
@@ -227,6 +229,11 @@ class ScoreFragment : Fragment() {
             scoreChart.setScaleEnabled(false) // 暂时关闭缩放
             scoreChart.setPinchZoom(false) // 暂时关闭双指缩放
             
+            // 性能优化设置
+            scoreChart.setMaxVisibleValueCount(50) // 限制可见数据点数量
+            scoreChart.setVisibleXRangeMaximum(50f) // 限制X轴可见范围
+            scoreChart.setAutoScaleMinMaxEnabled(true) // 自动缩放
+            
             //设置选择监听器
             scoreChart.setOnChartValueSelectedListener(object : OnChartValueSelectedListener {
                 override fun onValueSelected(e: ChartEntry?, h: com.github.mikephil.charting.highlight.Highlight?) {
@@ -253,10 +260,12 @@ class ScoreFragment : Fragment() {
             val xAxis = scoreChart.xAxis
             xAxis.position = XAxis.XAxisPosition.BOTTOM
             xAxis.setDrawGridLines(false) //关闭X轴网格线
+            xAxis.setLabelCount(5, true) // 限制X轴标签数量
             
             //设置Y轴
             val leftAxis = scoreChart.axisLeft
             leftAxis.setDrawGridLines(false) //关闭Y轴网格线
+            leftAxis.setLabelCount(5, true) // 限制Y轴标签数量
             
             //隐藏右侧Y轴
             scoreChart.axisRight.isEnabled = false
