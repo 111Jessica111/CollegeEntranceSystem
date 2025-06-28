@@ -2,6 +2,7 @@ package com.example.collegeentrancesystem.module.detail
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.widget.ImageButton
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -18,6 +19,11 @@ class CollegeGuranteeActivity : BaseActivity<ActivityCollegeGuranteeBinding>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+
+        findViewById<ImageButton>(R.id.btn_back).setOnClickListener {
+            finish()
+        }
 
     }
 

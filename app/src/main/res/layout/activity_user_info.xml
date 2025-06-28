@@ -392,6 +392,7 @@
                             android:background="@android:color/transparent"
                             android:layout_marginRight="10dp"
                             android:src="@drawable/edit_like" />
+
                     </RelativeLayout>
 
                     <RelativeLayout
