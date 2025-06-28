@@ -438,7 +438,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="20dp"
                         android:layout_marginRight="10dp"
-                        android:layout_marginBottom="20dp">
+                        android:layout_marginBottom="10dp">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -463,14 +463,17 @@
                             android:id="@+id/user_like_info"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/edit_background"
-                            android:hint="输入您的兴趣爱好"
-                            android:textSize="14dp"
-                            android:padding="10dp"
-                            android:inputType="text"
+                            android:paddingLeft="5dp"
+                            android:paddingTop="5dp"
+                            android:paddingRight="5dp"
+                            android:inputType="textMultiLine"
+                            android:gravity="top|start"
                             android:imeOptions="actionDone"
-                            android:lines="4"
-                            android:cursorVisible="true" />
+                            android:minLines="10"
+                            android:hint="输入您的兴趣爱好"
+                            android:textSize="12dp"
+                            android:cursorVisible="true"
+                            android:background="@drawable/edit_background"/>
 
                     </RelativeLayout>
 

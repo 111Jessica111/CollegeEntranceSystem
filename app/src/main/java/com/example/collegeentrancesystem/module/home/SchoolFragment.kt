@@ -33,7 +33,7 @@ class SchoolFragment : Fragment() {
         setupRecyclerView()
         setupObservers()
         
-        // 初始加载数据
+        //初始加载数据
         viewModel.loadUniversities(requireContext())
         
         return view
@@ -53,7 +53,7 @@ class SchoolFragment : Fragment() {
         schoolRecycleView.layoutManager = LinearLayoutManager(context)
         schoolRecycleView.adapter = adapter
         
-        // 添加滚动监听器来实现分页加载
+        //添加滚动监听器来实现分页加载
         schoolRecycleView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
@@ -73,7 +73,7 @@ class SchoolFragment : Fragment() {
     }
     
     private fun setupObservers() {
-        // 数据变化时会自动更新RecyclerView
-        // BaseAdapter已经处理了LiveData的观察
+        //数据变化时会自动更新RecyclerView
+        //BaseAdapter已经处理了LiveData的观察
     }
 }
