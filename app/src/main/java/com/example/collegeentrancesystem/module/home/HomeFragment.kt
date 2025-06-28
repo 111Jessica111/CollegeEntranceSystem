@@ -43,6 +43,10 @@ class HomeFragment : Fragment() {
     private lateinit var inputUserDiff: EditText
     private lateinit var predictScore: TextView
     private lateinit var test4: TextView
+    private lateinit var btnAdventure: LinearLayout
+    private lateinit var btnSafe: LinearLayout
+    private lateinit var btnGuarantee: LinearLayout
+
 
     private lateinit var collegeRecycleView: RecyclerView
     private lateinit var viewModel: HomeFragmentViewModel
@@ -84,6 +88,9 @@ class HomeFragment : Fragment() {
         userScore = view.findViewById(R.id.user_score)
         predictScore = view.findViewById(R.id.predict_score)
         test4 = view.findViewById(R.id.test_4)
+        btnAdventure = view.findViewById(R.id.btn_adventure)
+        btnSafe = view.findViewById(R.id.btn_safe)
+        btnGuarantee = view.findViewById(R.id.btn_guarantee)
 
         collegeRecycleView = view.findViewById(R.id.college_recycleView)
         

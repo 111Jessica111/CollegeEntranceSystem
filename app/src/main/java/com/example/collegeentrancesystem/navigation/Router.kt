@@ -4,6 +4,9 @@ import android.content.Intent
 import com.example.collegeentrancesystem.MainActivity
 import com.example.collegeentrancesystem.base.BaseActivity
 import com.example.collegeentrancesystem.constant.PageName
+import com.example.collegeentrancesystem.module.detail.CollegeAdventureActivity
+import com.example.collegeentrancesystem.module.detail.CollegeGuranteeActivity
+import com.example.collegeentrancesystem.module.detail.CollegeSafeActivity
 import com.example.collegeentrancesystem.module.detail.UserInfoActivity
 
 object Router {
@@ -26,6 +29,21 @@ object Router {
                 } else {
                     startActivity(intent)
                 }
+            }
+            PageName.ADVENTURE -> {
+                val intent = Intent(this, CollegeAdventureActivity::class.java)
+                intentAction(intent)
+                startActivity(intent)
+            }
+            PageName.SAFE -> {
+                val intent = Intent(this, CollegeSafeActivity::class.java)
+                intentAction(intent)
+                startActivity(intent)
+            }
+            PageName.GURANTEE -> {
+                val intent = Intent(this, CollegeGuranteeActivity::class.java)
+                intentAction(intent)
+                startActivity(intent)
             }
         }
     }
