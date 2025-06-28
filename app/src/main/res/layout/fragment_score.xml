@@ -53,6 +53,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="13dp"
+        android:layout_marginTop="10dp"
         android:text="一分一段表"
         android:textStyle="bold"/>
 
@@ -73,14 +74,14 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:textColor="@color/gray"
+            android:text="人数"
             android:textSize="12dp"/>
 
         <TextView
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:textColor="@color/gray"
+            android:text="排名"
             android:textSize="12dp"/>
 
     </LinearLayout>

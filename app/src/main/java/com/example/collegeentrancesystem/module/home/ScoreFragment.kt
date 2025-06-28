@@ -10,10 +10,14 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Spinner
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.collegeentrancesystem.R
+import com.example.collegeentrancesystem.base.list.BaseAdapter
 import com.example.collegeentrancesystem.constant.Province
 import com.example.collegeentrancesystem.constant.SubjectModule
 import com.example.collegeentrancesystem.constant.YearModule
+import com.example.collegeentrancesystem.module.adapter.ScoreViewHolder
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
@@ -24,13 +28,12 @@ import com.google.gson.reflect.TypeToken
 class ScoreFragment : Fragment() {
     private lateinit var scoreChart: LineChart
     private lateinit var viewModel: ScoreFragmentViewModel
+    private lateinit var scoreRecyclerView: RecyclerView
+    private lateinit var scoreAdapter: BaseAdapter
 
     private lateinit var provinceSpinner: Spinner
     private lateinit var yearSpinner: Spinner
     private lateinit var subjectSpinner: Spinner
-
-    private lateinit var selectedProvince: String
-    private lateinit var selectedYear: String
 
     private var provinceList: List<Province> = emptyList()
     private var yearsList: List<String> = emptyList()
@@ -56,18 +59,21 @@ class ScoreFragment : Fragment() {
             initViews(view)
 
             scoreChart = view.findViewById(R.id.score_line)
+            scoreRecyclerView = view.findViewById(R.id.score_RecycleView)
+            
             //初始化图表
             setupChart()
+            //设置RecyclerView
+            setupRecyclerView()
             //加载数据
             viewModel.loadScoreChartData()
+            viewModel.loadScoreData(requireContext())
+            
             //观察数据变化
             viewModel.scoreChartData.observe(viewLifecycleOwner) { lineData ->
                 try {
                     scoreChart.data = lineData
                     scoreChart.invalidate()
-                    context?.let { ctx ->
-                        Toast.makeText(ctx, "图表数据加载完成", Toast.LENGTH_SHORT).show()
-                    }
                 } catch (e: Exception) {
                     Log.e("ScoreFragment", "设置图表数据失败", e)
                 }
@@ -83,6 +89,21 @@ class ScoreFragment : Fragment() {
             Log.e("ScoreFragment", "创建视图失败", e)
             return null
         }
+    }
+
+    private fun setupRecyclerView() {
+        scoreRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        
+        scoreAdapter = BaseAdapter().build {
+            setItems<ScoreViewHolder, com.example.collegeentrancesystem.bean.ScoreData>(
+                lifecycleOwner = viewLifecycleOwner,
+                layoutId = R.layout.score_show,
+                list = viewModel.scoreList
+            ) { holder, scoreData ->
+                holder.bind(scoreData)
+            }
+        }
+        scoreRecyclerView.adapter = scoreAdapter
     }
 
     private fun loadProvinceData() {
@@ -169,7 +190,7 @@ class ScoreFragment : Fragment() {
 
             }
         }
-        // 设置年份选择监听
+        //设置年份选择监听
         yearSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 //年份选择监听事件
@@ -206,7 +227,7 @@ class ScoreFragment : Fragment() {
             scoreChart.setScaleEnabled(false) // 暂时关闭缩放
             scoreChart.setPinchZoom(false) // 暂时关闭双指缩放
             
-            // 设置选择监听器
+            //设置选择监听器
             scoreChart.setOnChartValueSelectedListener(object : OnChartValueSelectedListener {
                 override fun onValueSelected(e: ChartEntry?, h: com.github.mikephil.charting.highlight.Highlight?) {
                     try {

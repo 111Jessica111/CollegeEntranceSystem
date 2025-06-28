@@ -1,5 +1,6 @@
 package com.example.collegeentrancesystem.module.home
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -7,15 +8,21 @@ import com.example.collegeentrancesystem.R
 import com.example.collegeentrancesystem.base.BaseViewModel
 import com.example.collegeentrancesystem.bean.College
 import com.example.collegeentrancesystem.bean.Entry
+import com.example.collegeentrancesystem.bean.ScoreData
 import com.example.collegeentrancesystem.constant.PageName
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.data.Entry as ChartEntry
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 
 class ScoreFragmentViewModel: BaseViewModel() {
 
     private val _scoreChartData = MutableLiveData<LineData>()
     val scoreChartData: LiveData<LineData> = _scoreChartData
+
+    private val _scoreList = MutableLiveData<List<ScoreData>>()
+    val scoreList: LiveData<List<ScoreData>> = _scoreList
 
     fun loadScoreChartData(){
         try {
@@ -53,6 +60,37 @@ class ScoreFragmentViewModel: BaseViewModel() {
             } catch (e2: Exception) {
                 Log.e("ScoreFragmentViewModel", "创建空数据失败", e2)
             }
+        }
+    }
+
+    fun loadScoreData(context: Context) {
+        try {
+            //读取JSON文件
+            val inputStream = context.assets.open("score.json")
+            val jsonString = inputStream.bufferedReader().use { it.readText() }
+            
+            //使用Gson解析JSON
+            val type = object : TypeToken<List<Map<String, String>>>() {}.type
+            val jsonList: List<Map<String, String>> = Gson().fromJson(jsonString, type)
+            
+            //转换为ScoreData对象列表
+            val scoreDataList = jsonList.map { jsonMap ->
+                ScoreData(
+                    score = jsonMap["分数"] ?: "",
+                    people = jsonMap["人数"] ?: "",
+                    rank = jsonMap["排名"] ?: ""
+                )
+            }
+            
+            //过滤掉人数为0的数据，只显示有人的分数段
+            val filteredScoreData = scoreDataList.filter { it.people != "0" }
+            
+            _scoreList.value = filteredScoreData
+            
+        } catch (e: Exception) {
+            Log.e("ScoreFragmentViewModel", "加载分数数据失败", e)
+            // 如果加载失败，设置空列表
+            _scoreList.value = emptyList()
         }
     }
 
