@@ -42,6 +42,7 @@ class HomeFragment : Fragment() {
     private lateinit var inputUserScore: EditText
     private lateinit var inputUserDiff: EditText
     private lateinit var predictScore: TextView
+    private lateinit var test4: TextView
 
     private lateinit var collegeRecycleView: RecyclerView
     private lateinit var viewModel: HomeFragmentViewModel
@@ -57,6 +58,9 @@ class HomeFragment : Fragment() {
             userProvince.text = province?.take(2) ?: ""
             userYear.text = year
             userCourseChoose.text = subjects?.joinToString("/") { it.take(1) } ?: ""
+            
+            //根据年份更新test4的文本
+            updateTest4Text()
         }
     }
 
@@ -79,14 +83,18 @@ class HomeFragment : Fragment() {
         userYear = view.findViewById(R.id.user_year)
         userScore = view.findViewById(R.id.user_score)
         predictScore = view.findViewById(R.id.predict_score)
+        test4 = view.findViewById(R.id.test_4)
 
         collegeRecycleView = view.findViewById(R.id.college_recycleView)
         
-        // 设置RecyclerView
+        //设置RecyclerView
         setupRecyclerView()
         
-        // 加载大学数据
+        //加载大学数据
         viewModel.loadCollegeData()
+        
+        //初始化test4文本
+        updateTest4Text()
 
         btnEditInfo.setOnClickListener {
             val intent = Intent(requireContext(), UserInfoActivity::class.java)
@@ -135,6 +143,10 @@ class HomeFragment : Fragment() {
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 userScore.text = inputUserScore.text.toString()
                 dialog.dismiss()
+                
+                // 更新test4文本
+                updateTest4Text()
+                
                 sendMessagetoPy()
                 // 分数输入完成后判断年份
                 if (userYear.text.toString() == "2023") {
@@ -146,6 +158,7 @@ class HomeFragment : Fragment() {
             }
         }
     }
+
     //难度
     private fun InputDiff() {
 
@@ -208,6 +221,11 @@ class HomeFragment : Fragment() {
                     val rank_before = jsonObject.getString("searchRank")
                     predictScore.text = rank_before.toString()
                 }
+                
+                //更新test4文本
+                runOnUiThread {
+                    updateTest4Text()
+                }
 
             }catch (e: Exception){
                 e.printStackTrace()
@@ -216,5 +234,14 @@ class HomeFragment : Fragment() {
                 }
             }
         }.start()
+    }
+
+    //根据年份更新test4的文本
+    private fun updateTest4Text() {
+        if (userYear.text.toString() == "2023") {
+            test4.text = "预估排名："
+        } else {
+            test4.text = "实际排名："
+        }
     }
 }

@@ -6,6 +6,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.collegeentrancesystem.R
 import com.example.collegeentrancesystem.bean.College
+import com.example.collegeentrancesystem.bean.ScoreData
 import com.example.collegeentrancesystem.utils.ImageUtils
 import com.example.collegeentrancesystem.utils.SimpleViewTarget
 import com.google.android.flexbox.FlexboxLayout
@@ -59,5 +60,18 @@ class CollegeViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             
             tagsContainer.addView(tagView, layoutParams)
         }
+    }
+}
+
+class ScoreViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    
+    private val scoreText: TextView = itemView.findViewById(R.id.score)
+    private val peopleText: TextView = itemView.findViewById(R.id.num)
+    private val rankText: TextView = itemView.findViewById(R.id.rank)
+
+    fun bind(scoreData: ScoreData) {
+        scoreText.text = scoreData.score
+        peopleText.text = scoreData.people
+        rankText.text = scoreData.rank
     }
 }
