@@ -45,8 +45,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginRight="10dp"
             android:layout_marginBottom="5dp"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="1dp">
+            app:cardCornerRadius="20dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -355,13 +354,13 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <RelativeLayout
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="20dp"
                         android:layout_marginRight="10dp"
-                        android:layout_marginBottom="20dp"
-                        android:layout_marginTop="20dp">
+                        android:layout_marginBottom="10dp"
+                        android:layout_marginTop="10dp">
 
                         <TextView
                             android:id="@+id/test_5"
@@ -373,34 +372,22 @@
                             android:textStyle="bold"
                             android:textSize="14dp" />
 
-                        <TextView
+                        <Spinner
                             android:id="@+id/user_like_province"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_toRightOf="@+id/test_5"
-                            android:text="----"
+                            android:layout_width="match_parent"
                             android:textSize="14dp"
-                            android:layout_gravity="center"
-                            android:textColor="@color/black"
-                            android:layout_marginLeft="10dp"/>
+                            android:layout_height="wrap_content">
+                        </Spinner>
 
-                        <ImageButton
-                            android:id="@+id/edit_user_like_province"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentRight="true"
-                            android:background="@android:color/transparent"
-                            android:layout_marginRight="10dp"
-                            android:src="@drawable/edit_like" />
+                    </LinearLayout>
 
-                    </RelativeLayout>
-
-                    <RelativeLayout
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="20dp"
                         android:layout_marginRight="10dp"
-                        android:layout_marginBottom="20dp">
+                        android:layout_marginBottom="10dp"
+                        android:layout_marginTop="10dp">
 
                         <TextView
                             android:id="@+id/test_6"
@@ -412,34 +399,22 @@
                             android:textStyle="bold"
                             android:textSize="14dp" />
 
-                        <TextView
+                        <Spinner
                             android:id="@+id/user_like_major"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_toRightOf="@+id/test_6"
-                            android:text="----"
+                            android:layout_width="match_parent"
                             android:textSize="14dp"
-                            android:layout_gravity="center"
-                            android:textColor="@color/black"
-                            android:layout_marginLeft="10dp"/>
+                            android:layout_height="wrap_content">
+                        </Spinner>
 
-                        <ImageButton
-                            android:id="@+id/edit_user_like_major"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentRight="true"
-                            android:background="@android:color/transparent"
-                            android:layout_marginRight="10dp"
-                            android:src="@drawable/edit_like" />
-
-                    </RelativeLayout>
+                    </LinearLayout>
 
                     <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="20dp"
                         android:layout_marginRight="10dp"
-                        android:layout_marginBottom="10dp">
+                        android:layout_marginBottom="10dp"
+                        android:layout_marginTop="10dp">
 
                         <TextView
                             android:layout_width="wrap_content"
