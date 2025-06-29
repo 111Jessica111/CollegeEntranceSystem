@@ -518,8 +518,6 @@ class HomeFragment : Fragment() {
                 val rank_before = jsonObject.getString("searchRank")
                 predictScore.text = rank_before.toString()
 
-
-                
                 //更新test4文本
                 runOnUiThread {
                     updateTest4Text()
@@ -541,48 +539,5 @@ class HomeFragment : Fragment() {
         } else {
             test4.text = "实际排名："
         }
-    }
-    
-    /**
-     * 测试网络连接（仅用于调试）
-     */
-    private fun testNetworkConnection() {
-        Thread {
-            try {
-                Log.d("HomeFragment", "开始测试网络连接...")
-                Log.d("HomeFragment", "服务器地址: ${Network.IP}")
-                
-                val client = OkHttpClient.Builder()
-                    .connectTimeout(10, java.util.concurrent.TimeUnit.SECONDS)
-                    .readTimeout(10, java.util.concurrent.TimeUnit.SECONDS)
-                    .build()
-                
-                val request = Request.Builder()
-                    .url("${Network.IP}/api/test")
-                    .get()
-                    .build()
-                
-                val response = client.newCall(request).execute()
-                Log.d("HomeFragment", "网络测试响应码: ${response.code}")
-                
-                if (response.isSuccessful) {
-                    Log.d("HomeFragment", "网络连接正常")
-                    runOnUiThread {
-                        Toast.makeText(requireActivity(), "网络连接正常", Toast.LENGTH_SHORT).show()
-                    }
-                } else {
-                    Log.e("HomeFragment", "网络连接失败: ${response.code}")
-                    runOnUiThread {
-                        Toast.makeText(requireActivity(), "网络连接失败: ${response.code}", Toast.LENGTH_SHORT).show()
-                    }
-                }
-                
-            } catch (e: Exception) {
-                Log.e("HomeFragment", "网络测试异常", e)
-                runOnUiThread {
-                    Toast.makeText(requireActivity(), "网络测试失败: ${e.message}", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }.start()
     }
 }

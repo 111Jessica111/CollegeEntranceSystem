@@ -112,9 +112,6 @@ class UserInfoActivity : BaseActivity<ActivityUserInfoBinding>() {
                 //执行
                 val response = client.newCall(request).execute()
                 
-                android.util.Log.d("UserInfoActivity", "响应码: ${response.code}")
-                android.util.Log.d("UserInfoActivity", "响应内容: ${response.body?.string()}")
-                
                 if (response.isSuccessful) {
                     ThreadUtils.runOnUiThread {
                         Toast.makeText(

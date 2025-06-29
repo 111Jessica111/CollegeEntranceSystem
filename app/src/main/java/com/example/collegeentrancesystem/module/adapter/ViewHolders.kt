@@ -78,7 +78,7 @@ class CollegeRecommendationViewHolder(itemView: View) : RecyclerView.ViewHolder(
         probability.text = "${collegeItem.probability}%"
         schoolHighlight.text = collegeItem.major
         
-        // 根据概率设置颜色
+        //根据概率设置颜色
         when {
             collegeItem.probability >= 90 -> probability.setTextColor(
                 itemView.context.getColor(R.color.green)

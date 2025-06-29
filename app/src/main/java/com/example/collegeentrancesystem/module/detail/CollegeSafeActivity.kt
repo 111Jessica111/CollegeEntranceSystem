@@ -3,24 +3,32 @@ package com.example.collegeentrancesystem.module.detail
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.widget.ImageButton
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.blankj.utilcode.util.ThreadUtils
 import com.example.collegeentrancesystem.R
 import com.example.collegeentrancesystem.base.BaseActivity
 import com.example.collegeentrancesystem.base.list.BaseAdapter
 import com.example.collegeentrancesystem.bean.CollegeItem
+import com.example.collegeentrancesystem.constant.Network
 import com.example.collegeentrancesystem.constant.PageName
 import com.example.collegeentrancesystem.databinding.ActivityCollegeSafeBinding
 import com.example.collegeentrancesystem.module.adapter.CollegeRecommendationViewHolder
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import org.json.JSONObject
 
 class CollegeSafeActivity : BaseActivity<ActivityCollegeSafeBinding>() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: BaseAdapter
-    private var collegeList: List<CollegeItem> = emptyList()
+    private val collegeListLiveData = MutableLiveData<List<CollegeItem>>()
 
     override val inflater: (LayoutInflater) -> ActivityCollegeSafeBinding
         get() = ActivityCollegeSafeBinding::inflate
@@ -30,8 +38,8 @@ class CollegeSafeActivity : BaseActivity<ActivityCollegeSafeBinding>() {
         enableEdgeToEdge()
 
         initViews()
-        loadMockData() // 这里先用模拟数据，实际应该从后端获取
         setupRecyclerView()
+        loadDataFromBackend()
 
         findViewById<ImageButton>(R.id.btn_back).setOnClickListener {
             finish()
@@ -47,7 +55,7 @@ class CollegeSafeActivity : BaseActivity<ActivityCollegeSafeBinding>() {
             setItems(
                 lifecycleOwner = this@CollegeSafeActivity,
                 layoutId = R.layout.predict_college_show,
-                list = androidx.lifecycle.MutableLiveData(collegeList),
+                list = collegeListLiveData,
                 action = { holder: CollegeRecommendationViewHolder, item: CollegeItem ->
                     holder.bind(item)
                 }
@@ -58,58 +66,57 @@ class CollegeSafeActivity : BaseActivity<ActivityCollegeSafeBinding>() {
         recyclerView.adapter = adapter
     }
 
-    private fun loadMockData() {
-        // 模拟后端返回的数据
-        val mockJson = """
-        {
-            "data": {
-                "safe": [
-                    {
-                        "major": "计算机类",
-                        "minRank": 14031,
-                        "probability": 96.1,
-                        "university": "中国地质大学（武汉）"
-                    },
-                    {
-                        "major": "计算机类",
-                        "minRank": 15751,
-                        "probability": 98,
-                        "university": "武汉科技大学"
-                    },
-                    {
-                        "major": "计算机类",
-                        "minRank": 17900,
-                        "probability": 99,
-                        "university": "武汉工程大学"
-                    },
-                    {
-                        "major": "计算机类",
-                        "minRank": 20092,
-                        "probability": 99,
-                        "university": "武汉工程大学"
-                    }
-                ]
-            }
-        }
-        """.trimIndent()
+    private fun loadDataFromBackend() {
+        //连接后端
+        Thread{
+            try {
+                //创建HTTP
+                val client = OkHttpClient.Builder()
+                    .connectTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+                    .readTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+                    .writeTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+                    .build()
+                val mediaType = "application/json".toMediaType()
+                val request = Request.Builder()
+                    .url("${Network.IP}/api/recommend")
+                    .build()
+                //执行
+                val response = client.newCall(request).execute()
 
-        try {
-            val type = object : TypeToken<Map<String, Any>>(){}.type
-            val jsonMap = Gson().fromJson<Map<String, Any>>(mockJson, type)
-            val data = jsonMap["data"] as Map<String, Any>
-            val safe = data["safe"] as List<Map<String, Any>>
-            
-            collegeList = safe.map { item ->
-                CollegeItem(
-                    major = item["major"] as String,
-                    minRank = (item["minRank"] as Double).toInt(),
-                    probability = item["probability"] as Double,
-                    university = item["university"] as String
-                )
+                val res = response.body?.string() ?: ""
+                val jsonObject = JSONObject(res)
+
+                if (jsonObject.optBoolean("error", true)) {
+                    val errorMessage = jsonObject.optString("message", "未知错误")
+                    throw Exception(errorMessage)
+                }
+
+                val data = jsonObject.getJSONObject("data")
+                val safe = data.getJSONArray("safe")
+
+                val collegeList = mutableListOf<CollegeItem>()
+                for (i in 0 until safe.length()) {
+                    val item = safe.getJSONObject(i)
+                    collegeList.add(
+                        CollegeItem(
+                            major = item.getString("major"),
+                            minRank = item.getInt("minRank"),
+                            probability = item.getDouble("probability"),
+                            university = item.getString("university")
+                        )
+                    )
+                }
+            } catch (e: Exception){
+                e.printStackTrace()
+                ThreadUtils.runOnUiThread {
+                    Toast.makeText(
+                        this,
+                        "网络连接失败，请检查网络设置",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+        }.start()
     }
 
     override fun getPageName(): PageName {
