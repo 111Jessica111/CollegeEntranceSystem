@@ -27,6 +27,7 @@ class UserInfoActivity : BaseActivity<ActivityUserInfoBinding>() {
     private lateinit var provinceSpinner: Spinner
     private lateinit var yearSpinner: Spinner
     private lateinit var flexBox: FlexboxLayout
+    private lateinit var userProvinceSpinner: Spinner
 
     private lateinit var selectedProvince: String
     private lateinit var selectedYear: String
@@ -97,10 +98,16 @@ class UserInfoActivity : BaseActivity<ActivityUserInfoBinding>() {
     }
 
     private fun setupListeners() {
-        // 省份选择监听
+        //省份选择监听
         provinceSpinner.setOnItemSelectedListener { _, _, position, _ ->
             //监听事件
         }
+
+        //倾向省份选择监听
+        userProvinceSpinner.setOnItemSelectedListener { _, _, position, _ ->
+            //监听事件
+        }
+
         //年份选择监听
         yearSpinner.setOnItemSelectedListener { _, _, position, _ ->
             //监听事件
@@ -122,6 +129,7 @@ class UserInfoActivity : BaseActivity<ActivityUserInfoBinding>() {
             val provinceAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, provinceNames)
             provinceAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             provinceSpinner.adapter = provinceAdapter
+            userProvinceSpinner.adapter = provinceAdapter
         }catch (e: Exception){
             e.printStackTrace()
         }
@@ -131,6 +139,7 @@ class UserInfoActivity : BaseActivity<ActivityUserInfoBinding>() {
         provinceSpinner = findViewById(R.id.edit_user_province)
         yearSpinner = findViewById(R.id.user_year)
         flexBox = findViewById(R.id.flexbox)
+        userProvinceSpinner = findViewById(R.id.user_like_province)
     }
 
     private fun initSubjects() {

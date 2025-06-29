@@ -32,8 +32,6 @@ class YearModule{
         //可查询年份
         fun getAllYears(): List<String>{
             return listOf(
-                "2025",
-                "2024",
                 "2023",
                 "2022",
                 "2021",
