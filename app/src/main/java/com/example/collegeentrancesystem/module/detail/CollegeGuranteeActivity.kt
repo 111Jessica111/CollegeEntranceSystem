@@ -49,12 +49,9 @@ class CollegeGuranteeActivity : BaseActivity<ActivityCollegeGuranteeBinding>() {
     }
 
     private fun loadChallengeDataFromLocal() {
-        android.util.Log.d("CollegeGuranteeActivity", "开始加载本地数据")
         Thread {
             try {
                 val file = File(filesDir, "recommend_result.json")
-                android.util.Log.d("CollegeGuranteeActivity", "文件路径: ${file.absolutePath}")
-                android.util.Log.d("CollegeGuranteeActivity", "文件是否存在: ${file.exists()}")
 
                 if (!file.exists()) {
                     ThreadUtils.runOnUiThread {
@@ -74,17 +71,16 @@ class CollegeGuranteeActivity : BaseActivity<ActivityCollegeGuranteeBinding>() {
                 val dataObject = jsonObject.getJSONObject("data")
                 
                 // 检查stable数组是否存在
-                if (!dataObject.has("stable")) {
+                if (!dataObject.has("safe")) {
                     ThreadUtils.runOnUiThread {
-                        Toast.makeText(this, "JSON数据格式错误：缺少stable字段", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "JSON数据格式错误：缺少safe字段", Toast.LENGTH_SHORT).show()
                     }
                     return@Thread
                 }
                 
-                val stableArray = dataObject.getJSONArray("safe")
+                val safeArray = dataObject.getJSONArray("safe")
 
-                if (stableArray.length() == 0) {
-                    android.util.Log.w("CollegeGuranteeActivity", "stable数组为空")
+                if (safeArray.length() == 0) {
                     ThreadUtils.runOnUiThread {
                         Toast.makeText(this, "暂无保底院校推荐", Toast.LENGTH_SHORT).show()
                     }
@@ -92,10 +88,9 @@ class CollegeGuranteeActivity : BaseActivity<ActivityCollegeGuranteeBinding>() {
                 }
 
                 val stableList = mutableListOf<CollegeItem>()
-                for (i in 0 until stableArray.length()) {
-                    val item = stableArray.getJSONObject(i)
-                    android.util.Log.d("CollegeGuranteeActivity", "解析第${i+1}个院校: ${item.toString()}")
-                    
+                for (i in 0 until safeArray.length()) {
+                    val item = safeArray.getJSONObject(i)
+
                     val collegeItem = CollegeItem(
                         major = item.getString("major"),
                         minRank = item.getInt("minRank"),
@@ -103,17 +98,13 @@ class CollegeGuranteeActivity : BaseActivity<ActivityCollegeGuranteeBinding>() {
                         university = item.getString("university")
                     )
                     stableList.add(collegeItem)
-                    android.util.Log.d("CollegeGuranteeActivity", "添加院校: ${collegeItem.university}")
                 }
 
-                android.util.Log.d("CollegeGuranteeActivity", "解析完成，共${stableList.size}个院校")
                 ThreadUtils.runOnUiThread {
                     collegeListLiveData.value = stableList
-                    android.util.Log.d("CollegeGuranteeActivity", "LiveData已更新，加载了 ${stableList.size} 个稳妥院校")
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                android.util.Log.e("CollegeGuranteeActivity", "加载稳妥数据失败", e)
                 ThreadUtils.runOnUiThread {
                     Toast.makeText(this, "加载稳妥数据失败: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
