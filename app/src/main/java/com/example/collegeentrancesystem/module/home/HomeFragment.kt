@@ -20,6 +20,7 @@ import com.example.collegeentrancesystem.R
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.GridLayoutManager
 import com.blankj.utilcode.util.ThreadUtils.runOnUiThread
 import com.example.collegeentrancesystem.base.list.BaseAdapter
 import com.example.collegeentrancesystem.bean.College
@@ -34,6 +35,10 @@ import okhttp3.Request
 import okhttp3.RequestBody
 import org.json.JSONObject
 import android.util.Log
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.example.collegeentrancesystem.base.BaseActivity
+import com.example.collegeentrancesystem.constant.PageName
+import com.example.collegeentrancesystem.navigation.Router.navigation
 
 class HomeFragment : Fragment() {
 
@@ -106,6 +111,31 @@ class HomeFragment : Fragment() {
         //初始化test4文本
         updateTest4Text()
 
+        btnAdventure.setOnClickListener {
+            (requireActivity() as? BaseActivity<*>)?.let { activity ->
+                activity.navigation(PageName.ADVENTURE){intent ->
+
+                }
+            }
+        }
+
+        btnGuarantee.setOnClickListener {
+            (requireActivity() as? BaseActivity<*>)?.let { activity ->
+                activity.navigation(PageName.GURANTEE){intent ->
+
+                }
+            }
+        }
+
+        btnSafe.setOnClickListener {
+            (requireActivity() as? BaseActivity<*>)?.let { activity ->
+                activity.navigation(PageName.SAFE){intent ->
+
+                }
+            }
+        }
+
+
         btnEditInfo.setOnClickListener {
             val intent = Intent(requireContext(), UserInfoActivity::class.java)
             userInfoLauncher.launch(intent)
@@ -119,7 +149,7 @@ class HomeFragment : Fragment() {
     }
     
     private fun setupRecyclerView() {
-        collegeRecycleView.layoutManager = LinearLayoutManager(requireContext())
+        collegeRecycleView.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
         
         collegeAdapter = BaseAdapter().build {
             setItems<CollegeViewHolder, College>(

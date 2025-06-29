@@ -401,11 +401,14 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/college_recycleView"
         android:layout_width="match_parent"
-        android:layout_marginLeft="15dp"
-        android:layout_marginRight="15dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:scrollbars="vertical"
-        android:overScrollMode="never"/>
+        android:overScrollMode="never"
+        android:clipToPadding="false"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"/>
 
 </LinearLayout>

@@ -32,11 +32,10 @@ class CollegeViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         collegeNature.text = college.nature
 
         // 直接设置本地图片资源
-        val imageResId = college.photo// 假设 College 类中有一个 imageResId 属性，存储图片资源的 ID
+        val imageResId = college.photo
         if (imageResId != 0) {
             collegeImage.setImageResource(imageResId)
         } else {
-            // 如果没有图片资源 ID，设置默认图片
             collegeImage.setImageResource(R.drawable.placeholder)
         }
 
@@ -48,6 +47,7 @@ class CollegeViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             val tagView = TextView(itemView.context, null, 0, R.style.TagStyle).apply {
                 text = tag
                 setTextColor(itemView.context.getColor(R.color.black))
+                setTextSize(8f)
             }
             
             val layoutParams = FlexboxLayout.LayoutParams(
