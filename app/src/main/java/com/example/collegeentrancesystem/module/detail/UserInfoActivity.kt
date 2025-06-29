@@ -9,10 +9,13 @@ import android.widget.ImageButton
 import android.widget.RelativeLayout
 import android.widget.Spinner
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import com.blankj.utilcode.util.ThreadUtils
 import com.example.collegeentrancesystem.R
 import com.example.collegeentrancesystem.base.BaseActivity
 import com.example.collegeentrancesystem.constant.DataModule
+import com.example.collegeentrancesystem.constant.Network
 import com.example.collegeentrancesystem.constant.PageName
 import com.example.collegeentrancesystem.constant.Province
 import com.example.collegeentrancesystem.constant.Subject
@@ -21,6 +24,11 @@ import com.example.collegeentrancesystem.databinding.ActivityUserInfoBinding
 import com.google.android.flexbox.FlexboxLayout
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody
+import org.json.JSONObject
 
 class UserInfoActivity : BaseActivity<ActivityUserInfoBinding>() {
 
@@ -54,6 +62,7 @@ class UserInfoActivity : BaseActivity<ActivityUserInfoBinding>() {
         setupSubjectClickListeners()
 
         findViewById<ImageButton>(R.id.btn_back).setOnClickListener {
+            sendMessagetoPy()  // 发送数据到后端
             finish()
         }
 
@@ -61,6 +70,66 @@ class UserInfoActivity : BaseActivity<ActivityUserInfoBinding>() {
             sendUserInfoToHome()
             finish()
         }
+
+    }
+
+    private fun sendMessagetoPy() {
+        //连接后端
+        Thread{
+            try {
+                //直接使用userProvinceSpinner的数据
+                val userProvince = userProvinceSpinner.selectedItem.toString()
+                
+                val userInfoJson = JSONObject().apply {
+                    put("userProvince", userProvince)
+                }.toString()
+
+                android.util.Log.d("UserInfoActivity", "发送数据: $userInfoJson")
+                android.util.Log.d("UserInfoActivity", "服务器地址: ${Network.IP}/api/recommend")
+
+                //创建HTTP
+                val client = OkHttpClient.Builder()
+                    .connectTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+                    .readTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+                    .writeTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+                    .build()
+                val mediaType = "application/json".toMediaType()
+                val request = Request.Builder()
+                    .url("${Network.IP}/api/recommend")
+                    .post(RequestBody.create(mediaType, userInfoJson))
+                    .addHeader("Content-Type", "application/json")
+                    .build()
+                
+                //执行
+                val response = client.newCall(request).execute()
+                
+                android.util.Log.d("UserInfoActivity", "响应码: ${response.code}")
+                android.util.Log.d("UserInfoActivity", "响应内容: ${response.body?.string()}")
+                
+                if (response.isSuccessful) {
+                    ThreadUtils.runOnUiThread {
+                        Toast.makeText(
+                            this,
+                            "数据发送成功",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                } else {
+                    throw Exception("服务器响应错误: ${response.code}")
+                }
+
+            }catch (e: Exception){
+                e.printStackTrace()
+                android.util.Log.e("UserInfoActivity", "网络请求失败", e)
+                ThreadUtils.runOnUiThread {
+                    Toast.makeText(
+                        this,
+                        "网络连接失败: ${e.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }.start()
     }
 
     private fun sendUserInfoToHome() {
@@ -68,6 +137,9 @@ class UserInfoActivity : BaseActivity<ActivityUserInfoBinding>() {
         selectedProvince = provinceSpinner.selectedItem.toString()
         selectedYear = yearSpinner.selectedItem.toString()
         selectedSubjects = subjects.filter{it.isSelected}.map { it.name }
+
+        //发送数据到后端
+        sendMessagetoPy()
 
         //传递
         val returnIntent = Intent()
@@ -107,6 +179,7 @@ class UserInfoActivity : BaseActivity<ActivityUserInfoBinding>() {
         //倾向省份选择监听
         userProvinceSpinner.setOnItemSelectedListener { _, _, position, _ ->
             //监听事件
+
         }
 
         //年份选择监听
