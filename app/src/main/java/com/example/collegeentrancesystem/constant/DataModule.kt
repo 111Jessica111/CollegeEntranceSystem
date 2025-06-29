@@ -64,6 +64,6 @@ class RequestCode{
 
 class Network{
     companion object{
-        val IP = "http://10.13.6.132:5000"
+        val IP = "http://10.10.252.42:5000"
     }
 }

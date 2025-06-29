@@ -28,6 +28,7 @@ class UserInfoActivity : BaseActivity<ActivityUserInfoBinding>() {
     private lateinit var yearSpinner: Spinner
     private lateinit var flexBox: FlexboxLayout
     private lateinit var userProvinceSpinner: Spinner
+    private lateinit var userLikeMajor: Spinner
 
     private lateinit var selectedProvince: String
     private lateinit var selectedYear: String
@@ -112,6 +113,11 @@ class UserInfoActivity : BaseActivity<ActivityUserInfoBinding>() {
         yearSpinner.setOnItemSelectedListener { _, _, position, _ ->
             //监听事件
         }
+
+        //专业选择监听
+        userLikeMajor.setOnItemSelectedListener {  _, _, position, _ ->
+            //监听事件
+        }
     }
 
     private fun loadProvinceData() {
@@ -140,6 +146,7 @@ class UserInfoActivity : BaseActivity<ActivityUserInfoBinding>() {
         yearSpinner = findViewById(R.id.user_year)
         flexBox = findViewById(R.id.flexbox)
         userProvinceSpinner = findViewById(R.id.user_like_province)
+        userLikeMajor = findViewById(R.id.user_like_major)
     }
 
     private fun initSubjects() {

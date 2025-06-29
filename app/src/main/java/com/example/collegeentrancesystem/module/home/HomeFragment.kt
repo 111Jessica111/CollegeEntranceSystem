@@ -517,6 +517,8 @@ class HomeFragment : Fragment() {
 
                 val rank_before = jsonObject.getString("searchRank")
                 predictScore.text = rank_before.toString()
+
+
                 
                 //更新test4文本
                 runOnUiThread {
