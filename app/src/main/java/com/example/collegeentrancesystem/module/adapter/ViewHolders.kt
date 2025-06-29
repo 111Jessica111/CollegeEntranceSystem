@@ -6,6 +6,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.collegeentrancesystem.R
 import com.example.collegeentrancesystem.bean.College
+import com.example.collegeentrancesystem.bean.CollegeItem
 import com.example.collegeentrancesystem.bean.ScoreData
 import com.example.collegeentrancesystem.bean.University
 import com.example.collegeentrancesystem.utils.ImageUtils
@@ -60,6 +61,34 @@ class CollegeViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             }
             
             tagsContainer.addView(tagView, layoutParams)
+        }
+    }
+}
+
+class CollegeRecommendationViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    
+    private val schoolName: TextView = itemView.findViewById(R.id.school_name)
+    private val schoolMinrank: TextView = itemView.findViewById(R.id.school_minrank)
+    private val probability: TextView = itemView.findViewById(R.id.probability)
+    private val schoolHighlight: TextView = itemView.findViewById(R.id.school_highlight)
+
+    fun bind(collegeItem: CollegeItem) {
+        schoolName.text = collegeItem.university
+        schoolMinrank.text = collegeItem.minRank.toString()
+        probability.text = "${collegeItem.probability}%"
+        schoolHighlight.text = collegeItem.major
+        
+        // 根据概率设置颜色
+        when {
+            collegeItem.probability >= 90 -> probability.setTextColor(
+                itemView.context.getColor(R.color.green)
+            )
+            collegeItem.probability >= 70 -> probability.setTextColor(
+                itemView.context.getColor(R.color.orange)
+            )
+            else -> probability.setTextColor(
+                itemView.context.getColor(R.color.red_1)
+            )
         }
     }
 }

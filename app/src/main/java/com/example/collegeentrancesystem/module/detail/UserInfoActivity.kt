@@ -29,6 +29,8 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
 import org.json.JSONObject
+import com.example.collegeentrancesystem.bean.MajorClass
+import com.example.collegeentrancesystem.bean.Major
 
 class UserInfoActivity : BaseActivity<ActivityUserInfoBinding>() {
 
@@ -37,6 +39,7 @@ class UserInfoActivity : BaseActivity<ActivityUserInfoBinding>() {
     private lateinit var flexBox: FlexboxLayout
     private lateinit var userProvinceSpinner: Spinner
     private lateinit var userLikeMajor: Spinner
+    private lateinit var userLikeMajorClass: Spinner
 
     private lateinit var selectedProvince: String
     private lateinit var selectedYear: String
@@ -46,6 +49,7 @@ class UserInfoActivity : BaseActivity<ActivityUserInfoBinding>() {
     private val subjects = mutableListOf<Subject>()
     private val subjectViews = mutableMapOf<String, TextView>()
     private var yearsList: List<String> = emptyList()
+    private var majorClassList: List<MajorClass> = emptyList()
 
     override val inflater: (LayoutInflater) -> ActivityUserInfoBinding
         get() = ActivityUserInfoBinding::inflate
@@ -58,11 +62,11 @@ class UserInfoActivity : BaseActivity<ActivityUserInfoBinding>() {
         initSubjects()
         loadProvinceData()
         loadYearData()
+        loadMajorClassData()
         setupListeners()
         setupSubjectClickListeners()
 
         findViewById<ImageButton>(R.id.btn_back).setOnClickListener {
-            sendMessagetoPy()  // 发送数据到后端
             finish()
         }
 
@@ -77,11 +81,16 @@ class UserInfoActivity : BaseActivity<ActivityUserInfoBinding>() {
         //连接后端
         Thread{
             try {
-                //直接使用userProvinceSpinner的数据
+                //获取用户选择的数据
                 val userProvince = userProvinceSpinner.selectedItem.toString()
+                val userMajorClass = userLikeMajorClass.selectedItem.toString()
                 
                 val userInfoJson = JSONObject().apply {
-                    put("userProvince", userProvince)
+                    put("userProvince", selectedProvince)
+                    put("subject", selectedSubjects)
+                    put("preferredProvince", userProvince)
+                    put("preferredMajor", userMajorClass)
+                    put("rank", 9000)
                 }.toString()
 
                 android.util.Log.d("UserInfoActivity", "发送数据: $userInfoJson")
@@ -187,10 +196,6 @@ class UserInfoActivity : BaseActivity<ActivityUserInfoBinding>() {
             //监听事件
         }
 
-        //专业选择监听
-        userLikeMajor.setOnItemSelectedListener {  _, _, position, _ ->
-            //监听事件
-        }
     }
 
     private fun loadProvinceData() {
@@ -214,12 +219,37 @@ class UserInfoActivity : BaseActivity<ActivityUserInfoBinding>() {
         }
     }
 
+    private fun loadMajorClassData() {
+        try {
+            //读取json文件
+            val inputStream = assets.open("all_majors.json")
+            val jsonString = inputStream.bufferedReader().use { it.readText() }
+
+            //Gson解析json
+            val type = object : TypeToken<List<MajorClass>>(){}.type
+            majorClassList = Gson().fromJson(jsonString, type)
+
+            //设置专业大类数据
+            val classNames = majorClassList.map { it.className }
+            val classAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, classNames)
+            classAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            userLikeMajorClass.adapter = classAdapter
+
+            //设置专业大类选择监听器
+            setupMajorClassListener()
+        }catch (e: Exception){
+            e.printStackTrace()
+            android.util.Log.e("UserInfoActivity", "加载专业数据失败", e)
+        }
+    }
+
     private fun initViews() {
         provinceSpinner = findViewById(R.id.edit_user_province)
         yearSpinner = findViewById(R.id.user_year)
         flexBox = findViewById(R.id.flexbox)
         userProvinceSpinner = findViewById(R.id.user_like_province)
         userLikeMajor = findViewById(R.id.user_like_major)
+        userLikeMajorClass = findViewById(R.id.user_like_major_class)
     }
 
     private fun initSubjects() {
@@ -280,6 +310,23 @@ class UserInfoActivity : BaseActivity<ActivityUserInfoBinding>() {
             else -> selectedSubjects.joinToString("/") { it.name.first().toString() }
         }
         findViewById<TextView>(R.id.user_course)?.text = displayText
+    }
+
+    private fun setupMajorClassListener() {
+        userLikeMajorClass.setOnItemSelectedListener { _, _, position, _ ->
+            //当选择专业大类时，更新具体专业列表
+            val selectedMajorClass = majorClassList.getOrNull(position)
+            if (selectedMajorClass != null) {
+                val majors = selectedMajorClass.`class`.map { it.name }
+                val majorAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, majors)
+                majorAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                userLikeMajor.adapter = majorAdapter
+            }
+        }
+
+        userLikeMajor.setOnItemSelectedListener { _, _, position, _ ->
+            val selectedMajor = userLikeMajor.selectedItem?.toString()
+        }
     }
 
     override fun getPageName(): PageName {
