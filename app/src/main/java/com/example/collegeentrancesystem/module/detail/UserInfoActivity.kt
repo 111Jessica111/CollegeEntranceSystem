@@ -31,6 +31,7 @@ import okhttp3.RequestBody
 import org.json.JSONObject
 import com.example.collegeentrancesystem.bean.MajorClass
 import com.example.collegeentrancesystem.bean.Major
+import java.io.File
 
 class UserInfoActivity : BaseActivity<ActivityUserInfoBinding>() {
 
@@ -111,8 +112,21 @@ class UserInfoActivity : BaseActivity<ActivityUserInfoBinding>() {
                 
                 //执行
                 val response = client.newCall(request).execute()
+
+                val res = response.body?.string() ?: ""
+                val jsonObject = JSONObject(res)
+
+                if (jsonObject.optBoolean("error", true)) {
+                    val errorMessage = jsonObject.optString("message", "未知错误")
+                    throw Exception(errorMessage)
+                }
+
+                val data = jsonObject.getJSONObject("data")
                 
                 if (response.isSuccessful) {
+                    // 保存JSON到本地文件
+                    saveJsonToLocal(res)
+                    
                     ThreadUtils.runOnUiThread {
                         Toast.makeText(
                             this,
@@ -136,6 +150,17 @@ class UserInfoActivity : BaseActivity<ActivityUserInfoBinding>() {
                 }
             }
         }.start()
+    }
+
+    private fun saveJsonToLocal(json: String) {
+        try {
+            val file = File(filesDir, "recommend_result.json")
+            file.writeText(json)
+            android.util.Log.d("UserInfoActivity", "JSON已保存到: ${file.absolutePath}")
+        } catch (e: Exception) {
+            e.printStackTrace()
+            android.util.Log.e("UserInfoActivity", "保存JSON失败", e)
+        }
     }
 
     private fun sendUserInfoToHome() {

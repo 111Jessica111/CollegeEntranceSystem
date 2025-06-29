@@ -73,10 +73,14 @@ class CollegeRecommendationViewHolder(itemView: View) : RecyclerView.ViewHolder(
     private val schoolHighlight: TextView = itemView.findViewById(R.id.school_highlight)
 
     fun bind(collegeItem: CollegeItem) {
+        android.util.Log.d("CollegeRecommendationViewHolder", "绑定数据: ${collegeItem.university}")
+        
         schoolName.text = collegeItem.university
         schoolMinrank.text = collegeItem.minRank.toString()
         probability.text = "${collegeItem.probability}%"
         schoolHighlight.text = collegeItem.major
+        
+        android.util.Log.d("CollegeRecommendationViewHolder", "设置文本: 学校=${collegeItem.university}, 排名=${collegeItem.minRank}, 概率=${collegeItem.probability}%, 专业=${collegeItem.major}")
         
         //根据概率设置颜色
         when {

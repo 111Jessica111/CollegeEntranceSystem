@@ -22,7 +22,9 @@ import com.google.gson.reflect.TypeToken
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.RequestBody
 import org.json.JSONObject
+import java.io.File
 
 class CollegeGuranteeActivity : BaseActivity<ActivityCollegeGuranteeBinding>() {
 
@@ -39,11 +41,84 @@ class CollegeGuranteeActivity : BaseActivity<ActivityCollegeGuranteeBinding>() {
 
         initViews()
         setupRecyclerView()
-        loadDataFromBackend()
+        loadChallengeDataFromLocal()
 
         findViewById<ImageButton>(R.id.btn_back).setOnClickListener {
             finish()
         }
+    }
+
+    private fun loadChallengeDataFromLocal() {
+        android.util.Log.d("CollegeGuranteeActivity", "开始加载本地数据")
+        Thread {
+            try {
+                val file = File(filesDir, "recommend_result.json")
+                android.util.Log.d("CollegeGuranteeActivity", "文件路径: ${file.absolutePath}")
+                android.util.Log.d("CollegeGuranteeActivity", "文件是否存在: ${file.exists()}")
+
+                if (!file.exists()) {
+                    ThreadUtils.runOnUiThread {
+                        Toast.makeText(this, "未找到推荐结果文件", Toast.LENGTH_SHORT).show()
+                    }
+                    return@Thread
+                }
+
+                val jsonString = file.readText()
+
+                val jsonObject = JSONObject(jsonString)
+
+                if (jsonObject.optBoolean("error", true)) {
+                    throw Exception("JSON数据错误")
+                }
+
+                val dataObject = jsonObject.getJSONObject("data")
+                
+                // 检查stable数组是否存在
+                if (!dataObject.has("stable")) {
+                    ThreadUtils.runOnUiThread {
+                        Toast.makeText(this, "JSON数据格式错误：缺少stable字段", Toast.LENGTH_SHORT).show()
+                    }
+                    return@Thread
+                }
+                
+                val stableArray = dataObject.getJSONArray("safe")
+
+                if (stableArray.length() == 0) {
+                    android.util.Log.w("CollegeGuranteeActivity", "stable数组为空")
+                    ThreadUtils.runOnUiThread {
+                        Toast.makeText(this, "暂无保底院校推荐", Toast.LENGTH_SHORT).show()
+                    }
+                    return@Thread
+                }
+
+                val stableList = mutableListOf<CollegeItem>()
+                for (i in 0 until stableArray.length()) {
+                    val item = stableArray.getJSONObject(i)
+                    android.util.Log.d("CollegeGuranteeActivity", "解析第${i+1}个院校: ${item.toString()}")
+                    
+                    val collegeItem = CollegeItem(
+                        major = item.getString("major"),
+                        minRank = item.getInt("minRank"),
+                        probability = item.getDouble("probability"),
+                        university = item.getString("university")
+                    )
+                    stableList.add(collegeItem)
+                    android.util.Log.d("CollegeGuranteeActivity", "添加院校: ${collegeItem.university}")
+                }
+
+                android.util.Log.d("CollegeGuranteeActivity", "解析完成，共${stableList.size}个院校")
+                ThreadUtils.runOnUiThread {
+                    collegeListLiveData.value = stableList
+                    android.util.Log.d("CollegeGuranteeActivity", "LiveData已更新，加载了 ${stableList.size} 个稳妥院校")
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                android.util.Log.e("CollegeGuranteeActivity", "加载稳妥数据失败", e)
+                ThreadUtils.runOnUiThread {
+                    Toast.makeText(this, "加载稳妥数据失败: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }.start()
     }
 
     private fun initViews() {
@@ -64,59 +139,6 @@ class CollegeGuranteeActivity : BaseActivity<ActivityCollegeGuranteeBinding>() {
 
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
-    }
-
-    private fun loadDataFromBackend() {
-        //连接后端
-        Thread{
-            try {
-                //创建HTTP
-                val client = OkHttpClient.Builder()
-                    .connectTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
-                    .readTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
-                    .writeTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
-                    .build()
-                val mediaType = "application/json".toMediaType()
-                val request = Request.Builder()
-                    .url("${Network.IP}/api/recommend")
-                    .build()
-                //执行
-                val response = client.newCall(request).execute()
-
-                val res = response.body?.string() ?: ""
-                val jsonObject = JSONObject(res)
-
-                if (jsonObject.optBoolean("error", true)) {
-                    val errorMessage = jsonObject.optString("message", "未知错误")
-                    throw Exception(errorMessage)
-                }
-
-                val data = jsonObject.getJSONObject("data")
-                val stable = data.getJSONArray("stable")
-
-                val collegeList = mutableListOf<CollegeItem>()
-                for (i in 0 until stable.length()) {
-                    val item = stable.getJSONObject(i)
-                    collegeList.add(
-                        CollegeItem(
-                            major = item.getString("major"),
-                            minRank = item.getInt("minRank"),
-                            probability = item.getDouble("probability"),
-                            university = item.getString("university")
-                        )
-                    )
-                }
-            } catch (e: Exception){
-                e.printStackTrace()
-                ThreadUtils.runOnUiThread {
-                    Toast.makeText(
-                        this,
-                        "网络连接失败，请检查网络设置",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
-        }.start()
     }
 
     override fun getPageName(): PageName {
