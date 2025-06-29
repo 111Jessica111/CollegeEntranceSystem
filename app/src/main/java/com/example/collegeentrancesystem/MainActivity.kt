@@ -14,6 +14,7 @@ import com.example.collegeentrancesystem.constant.PageName
 import com.example.collegeentrancesystem.databinding.ActivityMainBinding
 import com.example.collegeentrancesystem.module.home.MyPagerAdapter
 import kotlinx.coroutines.launch
+import java.io.File
 
 class MainActivity : BaseActivity<ActivityMainBinding>() {
 
@@ -29,6 +30,12 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        
+        // 删除之前的推荐结果文件
+        deletePreviousRecommendFile()
+        
+        setContentView(R.layout.activity_main)
 
         initViews()
         setupViewPager()
@@ -70,5 +77,20 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
 
     override fun getPageName(): PageName {
         return PageName.MAIN
+    }
+
+    /**
+     * 删除之前的推荐结果文件
+     */
+    private fun deletePreviousRecommendFile() {
+        try {
+            val file = File(filesDir, "recommend_result.json")
+            if (file.exists()) {
+                val deleted = file.delete()
+                android.util.Log.d("MainActivity", "删除之前的推荐文件: ${if (deleted) "成功" else "失败"}")
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("MainActivity", "删除推荐文件失败", e)
+        }
     }
 }

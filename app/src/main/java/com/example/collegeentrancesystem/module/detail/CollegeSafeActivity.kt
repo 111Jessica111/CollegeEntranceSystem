@@ -52,6 +52,8 @@ class CollegeSafeActivity : BaseActivity<ActivityCollegeSafeBinding>() {
         Thread {
             try {
                 val file = File(filesDir, "recommend_result.json")
+                android.util.Log.d("CollegeSafeActivity", "开始加载稳妥数据，文件路径: ${file.absolutePath}")
+                android.util.Log.d("CollegeSafeActivity", "文件是否存在: ${file.exists()}")
 
                 if (!file.exists()) {
                     ThreadUtils.runOnUiThread {
@@ -61,6 +63,8 @@ class CollegeSafeActivity : BaseActivity<ActivityCollegeSafeBinding>() {
                 }
 
                 val jsonString = file.readText()
+                android.util.Log.d("CollegeSafeActivity", "读取到的JSON长度: ${jsonString.length}")
+                android.util.Log.d("CollegeSafeActivity", "JSON内容前100字符: ${jsonString.take(100)}")
 
                 val jsonObject = JSONObject(jsonString)
 
@@ -70,7 +74,7 @@ class CollegeSafeActivity : BaseActivity<ActivityCollegeSafeBinding>() {
 
                 val dataObject = jsonObject.getJSONObject("data")
                 
-                //检查safe数组是否存在
+                //检查stable数组是否存在
                 if (!dataObject.has("stable")) {
                     ThreadUtils.runOnUiThread {
                         Toast.makeText(this, "JSON数据格式错误：缺少stable字段", Toast.LENGTH_SHORT).show()
@@ -79,6 +83,7 @@ class CollegeSafeActivity : BaseActivity<ActivityCollegeSafeBinding>() {
                 }
                 
                 val stableArray = dataObject.getJSONArray("stable")
+                android.util.Log.d("CollegeSafeActivity", "稳妥数组长度: ${stableArray.length()}")
 
                 if (stableArray.length() == 0) {
                     ThreadUtils.runOnUiThread {
@@ -100,11 +105,13 @@ class CollegeSafeActivity : BaseActivity<ActivityCollegeSafeBinding>() {
                     safeList.add(collegeItem)
                 }
 
+                android.util.Log.d("CollegeSafeActivity", "解析完成，共${safeList.size}个稳妥院校")
                 ThreadUtils.runOnUiThread {
                     collegeListLiveData.value = safeList
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
+                android.util.Log.e("CollegeSafeActivity", "加载保底数据失败", e)
                 ThreadUtils.runOnUiThread {
                     Toast.makeText(this, "加载保底数据失败: ${e.message}", Toast.LENGTH_SHORT).show()
                 }

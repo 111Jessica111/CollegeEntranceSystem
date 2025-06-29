@@ -39,6 +39,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.collegeentrancesystem.base.BaseActivity
 import com.example.collegeentrancesystem.constant.PageName
 import com.example.collegeentrancesystem.navigation.Router.navigation
+import java.io.File
 
 class HomeFragment : Fragment() {
 
@@ -66,6 +67,7 @@ class HomeFragment : Fragment() {
             val province = data?.getStringExtra("province")
             val year = data?.getStringExtra("year")
             val subjects = data?.getStringArrayListExtra("subjects")
+            val needRefresh = data?.getBooleanExtra("needRefresh", false) ?: false
 
             userProvince.text = province?.take(2) ?: ""
             userYear.text = year
@@ -73,6 +75,17 @@ class HomeFragment : Fragment() {
             
             //根据年份更新test4的文本
             updateTest4Text()
+            
+            // 如果标记需要刷新，延迟一下确保文件写入完成后再刷新
+            if (needRefresh) {
+                // 延迟500ms确保文件写入完成
+                view?.postDelayed({
+                    updateRecommendCounts()
+                }, 500)
+            } else {
+                // 用户信息更新后，刷新推荐数量
+                updateRecommendCounts()
+            }
         }
     }
 
@@ -145,7 +158,62 @@ class HomeFragment : Fragment() {
             InputUserScore()
         }
         
+        // 更新推荐数量显示
+        updateRecommendCounts()
+        
         return view
+    }
+    
+    override fun onResume() {
+        super.onResume()
+        // 每次返回首页时更新推荐数量
+        updateRecommendCounts()
+    }
+    
+    /**
+     * 更新推荐数量显示
+     */
+    private fun updateRecommendCounts() {
+        try {
+            val file = File(requireContext().filesDir, "recommend_result.json")
+            
+            if (!file.exists()) {
+                // 文件不存在，显示默认值
+                setRecommendCounts("--", "--", "--")
+                return
+            }
+            
+            val jsonString = file.readText()
+
+            val jsonObject = JSONObject(jsonString)
+            
+            if (jsonObject.optBoolean("error", true)) {
+                setRecommendCounts("--", "--", "--")
+                return
+            }
+            
+            val dataObject = jsonObject.getJSONObject("data")
+            
+            // 获取各类型推荐数量
+            val adventureCount = if (dataObject.has("adventure")) dataObject.getJSONArray("adventure").length() else 0
+            val stableCount = if (dataObject.has("stable")) dataObject.getJSONArray("stable").length() else 0
+            val safeCount = if (dataObject.has("safe")) dataObject.getJSONArray("safe").length() else 0
+            
+            setRecommendCounts(adventureCount.toString(), stableCount.toString(), safeCount.toString())
+            
+        } catch (e: Exception) {
+            e.printStackTrace()
+            setRecommendCounts("--", "--", "--")
+        }
+    }
+    
+    /**
+     * 设置推荐数量到UI
+     */
+    private fun setRecommendCounts(adventure: String, stable: String, safe: String) {
+        view?.findViewById<TextView>(R.id.adventure_sum)?.text = adventure
+        view?.findViewById<TextView>(R.id.safe_sum)?.text = stable
+        view?.findViewById<TextView>(R.id.guarantee_sum)?.text = safe
     }
     
     private fun setupRecyclerView() {
@@ -234,7 +302,7 @@ class HomeFragment : Fragment() {
                             .build()
                         val mediaType = "application/json".toMediaType()
                         val request = Request.Builder()
-                            .url("${Network.IP}/api/user_difficulty")
+                            .url("${Network.IP_1}/api/user_difficulty")
                             .post(RequestBody.create(mediaType, userDiffJson))
                             .addHeader("Content-Type", "application/json")
                             .build()
@@ -261,19 +329,18 @@ class HomeFragment : Fragment() {
                         //在主线程更新UI
                         runOnUiThread {
                             predictScore.text = rank_before.toString()
-                            Toast.makeText(requireActivity(), "难度系数发送成功", Toast.LENGTH_SHORT).show()
+
                             dialog.dismiss()
                         }
 
                     } catch (e: Exception) {
                         Log.e("HomeFragment", "发送难度系数失败", e)
                         runOnUiThread {
-                            Toast.makeText(requireActivity(), "发送失败: ${e.message}", Toast.LENGTH_SHORT).show()
+
                             dialog.dismiss()
                         }
                     }
                 }.start()
-                
                 true //表示事件已处理
             } else {
                 false //事件未处理
@@ -304,8 +371,7 @@ class HomeFragment : Fragment() {
             try {
                 if (userScore.text.toString() == "---"){
                     runOnUiThread {
-                        Toast.makeText(requireActivity(), "未输入分数", Toast.LENGTH_SHORT).show()
-                        // 重置为默认状态
+                        //重置为默认状态
                         resetDifficultyDisplay(dialog)
                     }
                     return@Thread
@@ -326,14 +392,13 @@ class HomeFragment : Fragment() {
                     .build()
                 val mediaType = "application/json".toMediaType()
                 val request = Request.Builder()
-                    .url("${Network.IP}/api/difficulty_coefficient")
+                    .url("${Network.IP_1}/api/difficulty_coefficient")
                     .post(RequestBody.create(mediaType, userInfoJson))
                     .build()
                 //执行
                 val response = client.newCall(request).execute()
 
                 val res = response.body?.string() ?: ""
-                Log.d("HomeFragment", "服务器响应: $res")
                 
                 if (res.isEmpty()) {
                     throw Exception("服务器返回空响应")
@@ -354,6 +419,7 @@ class HomeFragment : Fragment() {
 
                 val rank_before = jsonObject.getString("searchRank")
                 predictScore.text = rank_before.toString()
+                sendMessagetoPy_1(rank_before.toString())
 
                 //更新test4文本
                 runOnUiThread {
@@ -361,16 +427,59 @@ class HomeFragment : Fragment() {
                 }
 
             }catch (e: Exception){
-                Log.e("HomeFragment", "获取难度系数失败", e)
                 runOnUiThread {
-                    Toast.makeText(requireActivity(), "获取难度系数失败: ${e.message}", Toast.LENGTH_SHORT).show()
                     // 重置为默认状态
                     resetDifficultyDisplay(dialog)
                 }
             }
         }.start()
     }
-    
+
+    private fun sendMessagetoPy_1(string: String) {
+        Thread {
+            try {
+                val userDiffJson = JSONObject().apply {
+                    put("rank", string)
+                }.toString()
+
+                //创建HTTP
+                val client = OkHttpClient.Builder()
+                    .connectTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+                    .readTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+                    .writeTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+                    .build()
+                val mediaType = "application/json".toMediaType()
+                val request = Request.Builder()
+                    .url("${Network.IP}/api/rank")
+                    .post(RequestBody.create(mediaType, userDiffJson))
+                    .addHeader("Content-Type", "application/json")
+                    .build()
+
+                //执行
+                val response = client.newCall(request).execute()
+
+                val res = response.body?.string() ?: ""
+
+                if (res.isEmpty()) {
+                    throw Exception("服务器返回空响应")
+                }
+
+                val jsonObject = JSONObject(res)
+
+                //检查响应状态
+                if (jsonObject.has("status") && jsonObject.getString("status") != "success") {
+                    val errorMsg = jsonObject.optString("message", "未知错误")
+                    throw Exception("服务器错误: $errorMsg")
+                }
+
+            } catch (e: Exception) {
+                runOnUiThread {
+
+                }
+            }
+        }.start()
+    }
+
     /**
      * 重置难度系数显示为默认状态
      */
@@ -400,7 +509,6 @@ class HomeFragment : Fragment() {
             updateDifficultyUI(difficultySet, dialog)
         } catch (e: Exception) {
             runOnUiThread {
-                Toast.makeText(requireActivity(), "解析难度系数数据失败: ${e.message}", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -475,7 +583,6 @@ class HomeFragment : Fragment() {
                 
             } catch (e: Exception) {
                 Log.e("HomeFragment", "更新UI失败", e)
-                Toast.makeText(requireActivity(), "更新界面失败", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -506,7 +613,7 @@ class HomeFragment : Fragment() {
                     .build()
                 val mediaType = "application/json".toMediaType()
                 val request = Request.Builder()
-                    .url("${Network.IP}/api/difficulty_coefficient")
+                    .url("${Network.IP_1}/api/difficulty_coefficient")
                     .post(RequestBody.create(mediaType, userInfoJson))
                     .build()
                 //执行
@@ -518,6 +625,8 @@ class HomeFragment : Fragment() {
                 val rank_before = jsonObject.getString("searchRank")
                 predictScore.text = rank_before.toString()
 
+                sendMessagetoPy_1(inputUserScore.text.toString())
+
                 //更新test4文本
                 runOnUiThread {
                     updateTest4Text()
@@ -526,7 +635,6 @@ class HomeFragment : Fragment() {
             }catch (e: Exception){
                 e.printStackTrace()
                 runOnUiThread {
-                    Toast.makeText(requireActivity(), "网络连接失败，请检查网络设置", Toast.LENGTH_SHORT).show()
                 }
             }
         }.start()

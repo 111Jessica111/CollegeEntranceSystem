@@ -47,6 +47,8 @@ class CollegeAdventureActivity : BaseActivity<ActivityCollegeAdventureBinding>()
         Thread {
             try {
                 val file = File(filesDir, "recommend_result.json")
+                android.util.Log.d("CollegeAdventureActivity", "开始加载挑战数据，文件路径: ${file.absolutePath}")
+                android.util.Log.d("CollegeAdventureActivity", "文件是否存在: ${file.exists()}")
                 
                 if (!file.exists()) {
                     ThreadUtils.runOnUiThread {
@@ -56,6 +58,8 @@ class CollegeAdventureActivity : BaseActivity<ActivityCollegeAdventureBinding>()
                 }
                 
                 val jsonString = file.readText()
+                android.util.Log.d("CollegeAdventureActivity", "读取到的JSON长度: ${jsonString.length}")
+                android.util.Log.d("CollegeAdventureActivity", "JSON内容前100字符: ${jsonString.take(100)}")
                 
                 val jsonObject = JSONObject(jsonString)
                 
@@ -65,6 +69,7 @@ class CollegeAdventureActivity : BaseActivity<ActivityCollegeAdventureBinding>()
                 
                 val dataObject = jsonObject.getJSONObject("data")
                 val challengeArray = dataObject.getJSONArray("challenge")
+                android.util.Log.d("CollegeAdventureActivity", "挑战数组长度: ${challengeArray.length()}")
 
                 val challengeList = mutableListOf<CollegeItem>()
                 for (i in 0 until challengeArray.length()) {
@@ -78,11 +83,13 @@ class CollegeAdventureActivity : BaseActivity<ActivityCollegeAdventureBinding>()
                     challengeList.add(collegeItem)
                 }
 
+                android.util.Log.d("CollegeAdventureActivity", "解析完成，共${challengeList.size}个挑战院校")
                 ThreadUtils.runOnUiThread {
                     collegeListLiveData.value = challengeList
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
+                android.util.Log.e("CollegeAdventureActivity", "加载挑战数据失败", e)
                 ThreadUtils.runOnUiThread {
                     Toast.makeText(this, "加载挑战数据失败: ${e.message}", Toast.LENGTH_SHORT).show()
                 }

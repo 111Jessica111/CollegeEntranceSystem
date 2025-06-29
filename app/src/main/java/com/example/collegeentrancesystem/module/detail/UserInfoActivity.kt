@@ -91,7 +91,6 @@ class UserInfoActivity : BaseActivity<ActivityUserInfoBinding>() {
                     put("subject", selectedSubjects)
                     put("preferredProvince", userProvince)
                     put("preferredMajor", userMajorClass)
-                    put("rank", 9000)
                 }.toString()
 
                 android.util.Log.d("UserInfoActivity", "发送数据: $userInfoJson")
@@ -157,6 +156,9 @@ class UserInfoActivity : BaseActivity<ActivityUserInfoBinding>() {
             val file = File(filesDir, "recommend_result.json")
             file.writeText(json)
             android.util.Log.d("UserInfoActivity", "JSON已保存到: ${file.absolutePath}")
+            android.util.Log.d("UserInfoActivity", "文件大小: ${file.length()} bytes")
+            android.util.Log.d("UserInfoActivity", "保存的JSON长度: ${json.length}")
+            android.util.Log.d("UserInfoActivity", "保存的JSON前100字符: ${json.take(100)}")
         } catch (e: Exception) {
             e.printStackTrace()
             android.util.Log.e("UserInfoActivity", "保存JSON失败", e)
@@ -177,6 +179,7 @@ class UserInfoActivity : BaseActivity<ActivityUserInfoBinding>() {
         returnIntent.putExtra("province", selectedProvince)
         returnIntent.putExtra("year", selectedYear)
         returnIntent.putExtra("subjects", ArrayList(selectedSubjects))
+        returnIntent.putExtra("needRefresh", true)
 
         //返回
         setResult(Activity.RESULT_OK, returnIntent)

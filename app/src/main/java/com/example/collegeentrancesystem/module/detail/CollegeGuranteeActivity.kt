@@ -52,6 +52,8 @@ class CollegeGuranteeActivity : BaseActivity<ActivityCollegeGuranteeBinding>() {
         Thread {
             try {
                 val file = File(filesDir, "recommend_result.json")
+                android.util.Log.d("CollegeGuranteeActivity", "开始加载保底数据，文件路径: ${file.absolutePath}")
+                android.util.Log.d("CollegeGuranteeActivity", "文件是否存在: ${file.exists()}")
 
                 if (!file.exists()) {
                     ThreadUtils.runOnUiThread {
@@ -61,6 +63,8 @@ class CollegeGuranteeActivity : BaseActivity<ActivityCollegeGuranteeBinding>() {
                 }
 
                 val jsonString = file.readText()
+                android.util.Log.d("CollegeGuranteeActivity", "读取到的JSON长度: ${jsonString.length}")
+                android.util.Log.d("CollegeGuranteeActivity", "JSON内容前100字符: ${jsonString.take(100)}")
 
                 val jsonObject = JSONObject(jsonString)
 
@@ -79,6 +83,7 @@ class CollegeGuranteeActivity : BaseActivity<ActivityCollegeGuranteeBinding>() {
                 }
                 
                 val safeArray = dataObject.getJSONArray("safe")
+                android.util.Log.d("CollegeGuranteeActivity", "保底数组长度: ${safeArray.length()}")
 
                 if (safeArray.length() == 0) {
                     ThreadUtils.runOnUiThread {
@@ -100,11 +105,13 @@ class CollegeGuranteeActivity : BaseActivity<ActivityCollegeGuranteeBinding>() {
                     stableList.add(collegeItem)
                 }
 
+                android.util.Log.d("CollegeGuranteeActivity", "解析完成，共${stableList.size}个保底院校")
                 ThreadUtils.runOnUiThread {
                     collegeListLiveData.value = stableList
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
+                android.util.Log.e("CollegeGuranteeActivity", "加载稳妥数据失败", e)
                 ThreadUtils.runOnUiThread {
                     Toast.makeText(this, "加载稳妥数据失败: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
